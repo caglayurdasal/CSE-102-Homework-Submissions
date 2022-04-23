@@ -1,0 +1,12 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/cagla/cse102_hws/hw5'
+clear
+echo "Cleaning compiled files..:\n"
+rm -f main
+echo "Compiling..:\n"
+gcc  main.c -o main -lm
+echo "Running the program..:\n"
+./main
+echo "Finished running the program.\n\n"
+make: Leaving directory '/home/cagla/cse102_hws/hw5'
+ 
