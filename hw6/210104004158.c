@@ -1,3 +1,8 @@
+/*
+ * This program is a mini racing game. It decides which player moves first
+ * and prints the game area and positions of the players.
+ * Homework#6 submission by Çağla Nur Yurdasal
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -21,16 +26,16 @@ int main(void)
 {
 	int pose1x = 1, pose1y = 1, pose2x = 3, pose2y = 3;
 	printMap(pose1x, pose1y, pose2x, pose2y);
-	printf("To start the game, players should dice and decide who's going to start game first.\n");
+	printf("To start the game, players should dice and decide who's going to move first.\n");
 	int player1, player2, second, first, firstToMove, secondToMove, check = 0, isFinished = 0;
 
 	do
 	{
 		player1 = dice(1);
 		player2 = dice(2);
-		check = startGame(player1, player2);
-	} while (check == 0); // keeps rolling dice until one is greater than the other
-
+		check = startGame(player1, player2); // deciding who will move first
+	} while (check == 0);					 // keeps rolling dice until one is greater than the other
+	// deciding in which turn players will move
 	if (check == 1)
 	{
 		first = 1;
@@ -44,29 +49,29 @@ int main(void)
 
 	do
 	{
-		if (first == 1)
+		if (first == 1) // if player1 moves first, it will dice first
 		{
 			player1 = dice(first);
 			player2 = dice(second);
 
 			/* Moving Player 1 */
-			if (pose1x < 28 && pose1y == 1)
+			if (pose1x < 28 && pose1y == 1) // if there is no obstacles on the road, move forward
 			{
-				pose1x = moveXright(player1, pose1x);
+				pose1x = moveXright(player1, pose1x); // if player1 is at y=1, move right to move forward
 				if (pose1x == 14)
 				{
 					printf("Penalty for Player 1.\n");
 					pose1x -= 2;
 				}
-				if (pose1x > 28)
+				if (pose1x > 28) // if player1 encounters an obstacle,i.e an edge, move down
 				{
-					pose1y = moveYdown(pose1x - 28, 1);
+					pose1y = moveYdown(pose1x - 28, 1); // if player 1 is at y=1, move down to move forward
 					pose1x = 28;
 				}
 			}
 			else if (pose1x == 28 && pose1y < 13)
 			{
-				pose1y = moveYdown(player1, pose1y);
+				pose1y = moveYdown(player1, pose1y); // if player1 is at x=28, move down to go forward
 				if (pose1y == 7)
 				{
 					printf("Penalty for Player 1.\n");
@@ -74,13 +79,13 @@ int main(void)
 				}
 				if (pose1y > 13)
 				{
-					pose1x = moveXleft(pose1y - 13, 28);
+					pose1x = moveXleft(pose1y - 13, 28); // if player1 encounters an obstacle,i.e an edge, move left
 					pose1y = 13;
 				}
 			}
 			else if (pose1y == 13 && pose1x > 1)
 			{
-				pose1x = moveXleft(player1, pose1x);
+				pose1x = moveXleft(player1, pose1x); // if y=13, move left to go forward
 				if (pose1x == 14)
 				{
 					printf("Penalty for Player 1.\n");
@@ -88,29 +93,31 @@ int main(void)
 				}
 				if (pose1x < 1)
 				{
-					pose1y = moveYup(1 - pose1x, 13);
+					pose1y = moveYup(1 - pose1x, 13); // if player1 encounters an obstacle,i.e an edge, go up
 					pose1x = 1;
 				}
 			}
 			else if (pose1x == 1 && pose1y > 2)
 			{
 				pose1y = moveYup(player1, pose1y);
-				if (pose1y <= 2)
+				if (pose1y <= 2) // if player1 is on or ahead of the finish line, stop moving on y=1
 				{
-					printf("*** PLAYER 1 HAS WON! ***\n\n");
+					pose1y = 1;
+					printf("\n\n*** PLAYER 1 HAS WON! ***\n\n");
+					printMap(pose1x, pose1y, pose2x, pose2y);
 					return 0;
 				}
 			}
 			/* Moving Player 2 */
-			if (pose2x < 26 && pose2y == 3)
+			if (pose2x < 26 && pose2y == 3) // if there is no obstacles on the road, go forward
 			{
-				pose2x = moveXright(player2, pose2x);
+				pose2x = moveXright(player2, pose2x); // move right to go forward if player2 is at y=3
 				if (pose2x == 10 || pose2x == 18)
 				{
 					printf("Penalty for Player 2.\n");
 					pose2x -= 2;
 				}
-				if (pose2x > 26)
+				if (pose2x > 26) // if player2 encounters an obstacle,i.e an edge, move down
 				{
 					pose2y = moveYdown((pose2x - 26), 3);
 					pose2x = 26;
@@ -118,7 +125,7 @@ int main(void)
 			}
 			else if (pose2x == 26 && pose2y < 11)
 			{
-				pose2y = moveYdown(player2, pose2y);
+				pose2y = moveYdown(player2, pose2y); // if player2 is at x=26, move down to go forward
 				if (pose2y == 5 || pose2y == 10)
 				{
 					printf("Penalty for Player 2.\n");
@@ -126,13 +133,13 @@ int main(void)
 				}
 				if (pose2y > 11)
 				{
-					pose2x = moveXleft((pose2y - 11), 26);
+					pose2x = moveXleft((pose2y - 11), 26); // if player2 encounters an obstacle, i.e an edge, go left
 					pose2y = 11;
 				}
 			}
 			else if (pose2y == 11 && pose2x > 3)
 			{
-				pose2x = moveXleft(player2, pose2x);
+				pose2x = moveXleft(player2, pose2x); // if player2 is at y=11, move left to go forward
 				if (pose2x == 10 || pose2x == 18)
 				{
 					printf("Penalty for Player 2.\n");
@@ -140,16 +147,18 @@ int main(void)
 				}
 				if (pose2x < 3)
 				{
-					pose2y = moveYup((3 - pose2x), 11);
+					pose2y = moveYup((3 - pose2x), 11); // if player2 encounters an obstacle, i.e an edge, go up
 					pose2x = 3;
 				}
 			}
 			else if (pose2x == 3 && pose2y > 4)
 			{
 				pose2y = moveYup(player2, pose2y);
-				if (pose2y <= 4)
+				if (pose2y <= 4) // if player2 is at or ahead of the finish line, stop moving on y=3
 				{
-					printf("*** PLAYER 2 HAS WON! ***\n\n");
+					pose2y = 3;
+					printf("\n\n*** PLAYER 2 HAS WON! ***\n\n");
+					printMap(pose1x, pose1y, pose2x, pose2y);
 					return 0;
 				}
 			}
@@ -160,15 +169,15 @@ int main(void)
 			player2 = dice(first);
 			player1 = dice(second);
 			/* Moving Player 2 */
-			if (pose2x < 26 && pose2y == 3)
+			if (pose2x < 26 && pose2y == 3) // if there is no obstacles on the road, go forward
 			{
-				pose2x = moveXright(player2, pose2x);
+				pose2x = moveXright(player2, pose2x); // move right to go forward if player2 is at y=3
 				if (pose2x == 10 || pose2x == 18)
 				{
 					printf("Penalty for Player 2.\n");
 					pose2x -= 2;
 				}
-				if (pose2x > 26)
+				if (pose2x > 26) // if player2 encounters an obstacle,i.e an edge, move down
 				{
 					pose2y = moveYdown((pose2x - 26), 3);
 					pose2x = 26;
@@ -176,7 +185,7 @@ int main(void)
 			}
 			else if (pose2x == 26 && pose2y < 11)
 			{
-				pose2y = moveYdown(player2, pose2y);
+				pose2y = moveYdown(player2, pose2y); // if player2 is at x=26, move down to go forward
 				if (pose2y == 5 || pose2y == 10)
 				{
 					printf("Penalty for Player 2.\n");
@@ -184,13 +193,13 @@ int main(void)
 				}
 				if (pose2y > 11)
 				{
-					pose2x = moveXleft((pose2y - 11), 26);
+					pose2x = moveXleft((pose2y - 11), 26); // if player2 encounters an obstacle, i.e an edge, go left
 					pose2y = 11;
 				}
 			}
 			else if (pose2y == 11 && pose2x > 3)
 			{
-				pose2x = moveXleft(player2, pose2x);
+				pose2x = moveXleft(player2, pose2x); // if player2 is at y=11, move left to go forward
 				if (pose2x == 10 || pose2x == 18)
 				{
 					printf("Penalty for Player 2.\n");
@@ -198,37 +207,39 @@ int main(void)
 				}
 				if (pose2x < 3)
 				{
-					pose2y = moveYup((3 - pose2x), 11);
+					pose2y = moveYup((3 - pose2x), 11); // if player2 encounters an obstacle, i.e an edge, go up
 					pose2x = 3;
 				}
 			}
 			else if (pose2x == 3 && pose2y > 4)
 			{
 				pose2y = moveYup(player2, pose2y);
-				if (pose2y <= 4)
+				if (pose2y <= 4) // if player2 is at or ahead of the finish line, stop moving on y=3
 				{
-					printf("*** PLAYER 2 HAS WON! ***\n\n");
+					pose2y = 3;
+					printf("\n\n*** PLAYER 2 HAS WON! ***\n\n");
+					printMap(pose1x, pose1y, pose2x, pose2y);
 					return 0;
 				}
 			}
 			/* Moving Player 1 */
-			if (pose1x < 28 && pose1y == 1)
+			if (pose1x < 28 && pose1y == 1) // if there is no obstacles on the road, move forward
 			{
-				pose1x = moveXright(player1, pose1x);
+				pose1x = moveXright(player1, pose1x); // if player1 is at y=1, move right to move forward
 				if (pose1x == 14)
 				{
 					printf("Penalty for Player 1.\n");
 					pose1x -= 2;
 				}
-				if (pose1x > 28)
+				if (pose1x > 28) // if player1 encounters an obstacle,i.e an edge, move down
 				{
-					pose1y = moveYdown(pose1x - 28, 1);
+					pose1y = moveYdown(pose1x - 28, 1); // if player 1 is at y=1, move down to move forward
 					pose1x = 28;
 				}
 			}
 			else if (pose1x == 28 && pose1y < 13)
 			{
-				pose1y = moveYdown(player1, pose1y);
+				pose1y = moveYdown(player1, pose1y); // if player1 is at x=28, move down to go forward
 				if (pose1y == 7)
 				{
 					printf("Penalty for Player 1.\n");
@@ -236,13 +247,13 @@ int main(void)
 				}
 				if (pose1y > 13)
 				{
-					pose1x = moveXleft(pose1y - 13, 28);
+					pose1x = moveXleft(pose1y - 13, 28); // if player1 encounters an obstacle,i.e an edge, move left
 					pose1y = 13;
 				}
 			}
 			else if (pose1y == 13 && pose1x > 1)
 			{
-				pose1x = moveXleft(player1, pose1x);
+				pose1x = moveXleft(player1, pose1x); // if y=13, move left to go forward
 				if (pose1x == 14)
 				{
 					printf("Penalty for Player 1.\n");
@@ -250,23 +261,24 @@ int main(void)
 				}
 				if (pose1x < 1)
 				{
-					pose1y = moveYup(1 - pose1x, 13);
+					pose1y = moveYup(1 - pose1x, 13); // if player1 encounters an obstacle,i.e an edge, go up
 					pose1x = 1;
 				}
 			}
 			else if (pose1x == 1 && pose1y > 2)
 			{
 				pose1y = moveYup(player1, pose1y);
-				if (pose1y <= 2)
+				if (pose1y <= 2) // if player1 is on or ahead of the finish line, stop moving on y=1
 				{
-					printf("*** PLAYER 1 HAS WON! ***\n\n");
+					pose1y = 1;
+					printf("\n\n*** PLAYER 1 HAS WON! ***\n\n");
+					printMap(pose1x, pose1y, pose2x, pose2y);
 					return 0;
 				}
 			}
 
 			printMap(pose1x, pose1y, pose2x, pose2y);
 		}
-
 	} while (isFinished == 0);
 
 	return 0;
@@ -321,7 +333,7 @@ void printMap(int pose1X, int pose1Y, int pose2X, int pose2Y)
 
 			/*** DRAWING OUTER SQUARE ***/
 			// Drawing top and bottom edges
-			if (0 <= c <= 29) // Left and right borders
+			if (0 <= c && c <= 29) // Left and right borders
 			{
 				if (r == 0 || r == 14) // Top and bottom borders
 				{
@@ -339,7 +351,7 @@ void printMap(int pose1X, int pose1Y, int pose2X, int pose2Y)
 				}
 			}
 			// Drawing left and right edges
-			if (1 <= r <= 13)
+			if (1 <= r && r <= 13)
 			{
 				if (c == 0 || c == 29)
 				{
@@ -436,42 +448,6 @@ void printMap(int pose1X, int pose1Y, int pose2X, int pose2Y)
 		}
 	}
 
-	// if (pose1X == 14 && pose1Y == 1)
-	// {
-	// 	printf("Penalty for Player 1.\n");
-	// 	pose1X -= 2;
-	// }
-	// else if (pose1X == 28 && pose1Y == 7)
-	// {
-	// 	printf("Penalty for Player 1.\n");
-	// 	pose1Y -= 2;
-	// }
-	// else if (pose1X == 14 && pose1Y == 13)
-	// {
-	// 	printf("Penalty for Player 1.\n");
-	// 	pose1X += 2;
-	// }
-
-	// if (pose2X == 10 && pose2Y == 3 || pose2X == 18 && pose2Y == 3)
-	// {
-	// 	printf("Penalty for Player 2.\n");
-	// 	pose2X -= 2;
-	// }
-	// else if (pose2X == 26 && pose2Y == 5 || pose2X == 26 && pose2Y == 10)
-	// {
-	// 	printf("Penalty for Player 2.\n");
-	// 	pose2Y -= 2;
-	// }
-	// else if (pose2X == 10 && pose2Y == 11 || pose2X == 18 && pose2Y == 11)
-	// {
-	// 	printf("Penalty for Player 2.\n");
-	// 	pose2X += 2;
-	// }
-
-	/* Marking the positions of Player 1 and Player 2 */
-	map[pose1Y][pose1X] = '1';
-	map[pose2Y][pose2X] = '2';
-
 	/* Penalty points for Player 1 */
 	map[1][14] = 'X';
 	map[7][28] = 'X';
@@ -488,6 +464,10 @@ void printMap(int pose1X, int pose1Y, int pose2X, int pose2Y)
 	/* Marking the finish lines */
 	map[2][1] = '_'; // Player 1 finish line
 	map[4][3] = '_'; // Player 2 finish line
+
+	/* Marking the positions of Player 1 and Player 2 */
+	map[pose1Y][pose1X] = '1';
+	map[pose2Y][pose2X] = '2';
 
 	for (int i = 0; i < 15; i++)
 	{
