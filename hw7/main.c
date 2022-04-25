@@ -30,7 +30,7 @@ int main(void)
     size_file = ftell(fp);  /* Store the current position of file
                                pointer to get the size of file*/
 
-    srand(time(NULL)); // Seed
+    srand(time(NULL)); // seed
 
     if (fp != NULL)
     {
@@ -44,7 +44,8 @@ int main(void)
                                                   scan until end of line and put the scanned word
                                                   in temp to discard it, then read the next word
                                                   from the start and put it in the word list  */
-            fscanf(fp, "%s", wordList[wordCount]);
+
+            fscanf(fp, "%s", wordList[wordCount]); /* Get the actual word */
 
             printf("%d. word: %s\n", wordCount + 1, wordList[wordCount]);
             fseek(fp, 0, SEEK_END); /* Go to end of file for the next iteration */
