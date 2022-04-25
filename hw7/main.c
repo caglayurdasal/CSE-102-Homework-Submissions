@@ -1,3 +1,11 @@
+/*
+ *  This program is a Word Puzzle: In a 15x15 board, players
+ *  try to find 7 randomly selected words. Words may be placed
+ *  horizontally, vertically, or diagonally.
+ *
+ *  Assignment #7 Submission by Çağla Nur Yurdasal
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -8,26 +16,21 @@
 int main(void)
 {
     FILE *fp;
-    int size_file;     // Size of wordlist.txt
-    int wordCount = 0; // Word count selected for the board
+    int size_file;     // size of wordlist.txt
+    int wordCount = 0; // word count selected for the board
     char board[ROW][COLUMN];
+    char wordList[7];
+    char c;
     fp = fopen("wordlist.txt", "r+");
 
-    fseek(fp, 0, SEEK_END); /* Go to end of file to find size */
-    size_file = ftell(fp);  /* Store the current position of file
-                             * pointer to get the size of file*/
-
-    srand(time(NULL)); // Seed
-
-    if (fp != NULL)
+    int num_lines = 0; // number of lines in .txt file
+    while (!feof(fp))
     {
-        while (wordCount <= 7) /* Select random 7 words for the board */
+        c = fgetc(fp);
+        if (c == '\n')
         {
-
-            fseek(fp, -1 * (rand() % size_file), SEEK_CUR); /* Move the position of file pointer back
-                                                             * random number of times */
-            fgets(board[ROW][COLUMN], 10, fp);              /* Store the word at which file pointer currently is */
-            fseek(fp, 0, SEEK_END);                         /* Go to end of file for the next iteration */
+            num_lines++;
         }
     }
+    printf("Lines: %d\n", num_lines);
 }
