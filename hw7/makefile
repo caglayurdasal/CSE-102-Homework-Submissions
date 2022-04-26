@@ -11,5 +11,5 @@ compile: main.c wordlist.txt
 run:
 	@echo "Running tests...\n"
 	@./test
-	@echo "******************************\n*** Finished running tests ***\n******************************\n"
+	@echo "\n*******************************\n*** Finished running tests. ***\n*******************************\n"
 
