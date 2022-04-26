@@ -61,11 +61,24 @@ int main(void)
             wordCount++;
         }
     }
+    /* Build the initial board */
+    for (int i = 0; i < 7; i++)
+    {
+        buildBoard(board, wordList[i]);
+    }
+    /* Display the initial board */
+    for (int r = 0; r < ROW; r++)
+    {
+        for (int c = 0; c < COLUMN; c++)
+        {
+            printf("%c ", board[r][c]);
+        }
+        printf("\n");
+    }
 }
 void buildBoard(char board[ROW][COLUMN], char word[MAX_LEN])
 {
     /* Put spaces initially inside the board for later check with characters */
-    char board[ROW][COLUMN];
     for (int r = 0; r < ROW; r++)
     {
         for (int c = 0; c < ROW; c++)
@@ -77,11 +90,11 @@ void buildBoard(char board[ROW][COLUMN], char word[MAX_LEN])
     srand(time(NULL));                    // seed
     for (int i = 0; i < 7; i++)
     {
-        /* Mark start point of the word at the board */
-        y_axis = rand() % 15;
-        x_axis = rand() % 15;
-        len_word = strlen(words[i]);
-        dir[i] = rand() % 8 + 1;
+        /* Get the start point of the word on the board */
+        y_axis = rand() % 15; // index 0-14
+        x_axis = rand() % 15; // index 0-14
+        len_word = strlen(word[i]);
+        dir[i] = rand() % 8 + 1; // directions 1-8
 
         switch (dir[i])
         {
@@ -128,17 +141,23 @@ int diag_down_left_to_right(char board[ROW][COLUMN], char word[], int y_axis, in
     int i = 0;
     while (i < len_word)
     {
-        if (board[y_axis][x_axis] == " ")
-        {
-            board[y_axis][x_axis] = word[i];
-            y_axis++;
-            x_axis++;
-            i++;
-        }
-        else
+        if ((y_axis + i) > 14 || (x_axis + i) > 14)
         {
             return -1;
         }
+        else if (board[y_axis][x_axis] != " ")
+        {
+            return -1;
+        }
+        i++;
+    }
+    i = 0;
+    while (i < len_word)
+    {
+        board[y_axis][x_axis] = word[i];
+        y_axis++;
+        x_axis++;
+        i++;
     }
     return 0;
 }
@@ -148,17 +167,25 @@ int diag_down_right_to_left(char board[ROW][COLUMN], char word[], int y_axis, in
     int i = 0;
     while (i < len_word)
     {
-        if (board[y_axis][x_axis] == " ")
-        {
-            board[y_axis][x_axis] = word[i];
-            y_axis++;
-            x_axis--;
-            i++;
-        }
-        else
+        if ((y_axis + i) > 14 || (x_axis - i) < 0)
         {
             return -1;
         }
+        else if (board[y_axis][x_axis] != " ")
+        {
+            return -1;
+        }
+        i++;
+    }
+    i = 0;
+    while (i < len_word)
+    {
+        board[y_axis][x_axis] = word[i];
+        y_axis++;
+        x_axis--;
+        i++;
+
+        return -1;
     }
     return 0;
 }
@@ -167,17 +194,23 @@ int diag_up_left_to_right(char board[ROW][COLUMN], char word[], int y_axis, int 
     int i = 0;
     while (i < len_word)
     {
-        if (board[y_axis][x_axis] == " ")
-        {
-            board[y_axis][x_axis] = word[i];
-            y_axis--;
-            x_axis++;
-            i++;
-        }
-        else
+        if ((y_axis - i) < 0 || (x_axis + i) > 14)
         {
             return -1;
         }
+        else if (board[y_axis][x_axis] != " ")
+        {
+            return -1;
+        }
+        i++;
+    }
+    i = 0;
+    while (i < len_word)
+    {
+        board[y_axis][x_axis] = word[i];
+        y_axis--;
+        x_axis++;
+        i++;
     }
     return 0;
 }
@@ -186,17 +219,23 @@ int diag_up_right_to_left(char board[ROW][COLUMN], char word[], int y_axis, int 
     int i = 0;
     while (i < len_word)
     {
-        if (board[y_axis][x_axis] == " ")
-        {
-            board[y_axis][x_axis] = word[i];
-            y_axis--;
-            x_axis--;
-            i++;
-        }
-        else
+        if ((y_axis - i) < 0 || (x_axis - i) < 0)
         {
             return -1;
         }
+        else if (board[y_axis][x_axis] != " ")
+        {
+            return -1;
+        }
+        i++;
+    }
+    i = 0;
+    while (i < len_word)
+    {
+        board[y_axis][x_axis] = word[i];
+        y_axis--;
+        x_axis--;
+        i++;
     }
     return 0;
 }
@@ -205,22 +244,41 @@ int left_to_right(char board[ROW][COLUMN], char word[], int y_axis, int x_axis, 
     int i = 0;
     while (i < len_word)
     {
-        if (board[y_axis][x_axis] == " ")
-        {
-            board[y_axis][x_axis] = word[i];
-            x_axis++;
-            i++;
-        }
-        else
+        if (x_axis + i > 14)
         {
             return -1;
         }
+        else if (board[y_axis][x_axis] != " ")
+        {
+            return -1;
+        }
+        i++;
+    }
+    i = 0;
+    while (i < len_word)
+    {
+        board[y_axis][x_axis] = word[i];
+        x_axis++;
+        i++;
     }
     return 0;
 }
 int right_to_left(char board[ROW][COLUMN], char word[], int y_axis, int x_axis, int len_word)
 {
     int i = 0;
+    while (i < len_word)
+    {
+        if (x_axis - i < 0)
+        {
+            return -1;
+        }
+        else if (board[y_axis][x_axis] != " ")
+        {
+            return -1;
+        }
+        i++;
+    }
+    i = 0;
     while (i < len_word)
     {
         if (board[y_axis][x_axis] == " ")
@@ -241,16 +299,22 @@ int upwards(char board[ROW][COLUMN], char word[], int y_axis, int x_axis, int le
     int i = 0;
     while (i < len_word)
     {
-        if (board[y_axis][x_axis] == " ")
-        {
-            board[y_axis][x_axis] = word[i];
-            y_axis--;
-            i++;
-        }
-        else
+        if (y_axis - i < 0)
         {
             return -1;
         }
+        else if (board[y_axis][x_axis] != " ")
+        {
+            return -1;
+        }
+        i++;
+    }
+    i = 0;
+    while (i < len_word)
+    {
+        board[y_axis][x_axis] = word[i];
+        y_axis--;
+        i++;
     }
     return 0;
 }
@@ -259,16 +323,23 @@ int downwards(char board[ROW][COLUMN], char word[], int y_axis, int x_axis, int 
     int i = 0;
     while (i < len_word)
     {
-        if (board[y_axis][x_axis] == " ")
-        {
-            board[y_axis][x_axis] = word[i];
-            y_axis++;
-            i++;
-        }
-        else
+        if (y_axis + i > 14)
         {
             return -1;
         }
+        else if (board[y_axis][x_axis] != " ")
+        {
+            return -1;
+        }
+        i++;
+    }
+    i = 0;
+
+    while (i < len_word)
+    {
+        board[y_axis][x_axis] = word[i];
+        y_axis++;
+        i++;
     }
     return 0;
 }
