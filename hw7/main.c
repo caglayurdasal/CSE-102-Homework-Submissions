@@ -18,6 +18,9 @@ void diag_up_left_to_right(char board[][COLUMN], char word[MAX_LEN], int x, int 
 void diag_up_right_to_left(char board[][COLUMN], char word[MAX_LEN], int x, int y);
 void diag_down_left_to_right(char board[][COLUMN], char word[MAX_LEN], int x, int y);
 void diag_down_right_to_left(char board[][COLUMN], char word[MAX_LEN], int x, int y);
+int check_len(int x, int y, int len_word, int dir);
+int check_overlapped_word(int x, int y, int dir, int l, int len_word, char board[][COLUMN], char word[MAX_LEN]);
+void delete_overlapping_word(int x, int y, int dist, int dir, char board[][COLUMN]);
 
 int main()
 {
@@ -52,9 +55,8 @@ int main()
   int x, y; /* Start point of the word */
   int temp_x, temp_y;
   char board[ROW][COLUMN];
-  board[0][0] = 0;
-  /* Put 0s on the board initially to check during later operations */
 
+  /* Put \0 characters on the board initially to check during later operations */
   for (int i = 0; i < ROW; i++)
   {
     for (int j = 0; j < COLUMN; j++)
@@ -63,242 +65,381 @@ int main()
     }
   }
 
+  /*  */
   for (int w = 0; w < NUM_WORDS; w++)
   {
-    int i, j;
+    int i, j, len_check;
     char word[MAX_LEN];
-    strcpy(word, words[w]);
-
-    int len_word = strlen(words[w]);
+    int len_word = strlen(words[w]); /* Length of one word */
     printf("Len of %d. word: %d\n", w + 1, len_word);
 
-    /* Decide the direction */
-    dir = rand() % 8 + 1;
-    /* Decide the start point of the word */
-    x = rand() % 15;
-    y = rand() % 15;
-    temp_x = x;
-    temp_y = y;
+    /* Check if there will be an overlap of characters or overflow due to length of word */
+    int dist = 0;
+    int overlap_check = check_overlapped_word(x, y, dir, dist, len_word, board, words[w]);
+    while (overlap_check == 1)
+    {
+      delete_overlapping_word(x, y, dist, dir, board);
+      do
+      {
+        /* Start point of the word */
+        x = rand() % 15;
+        y = rand() % 15;
+        temp_x = x;
+        temp_y = y;
+        dir = rand() % 8 + 1; /* Direction in which word will be placed */
+        len_check = check_len(x, y, len_word, dir);
+      } while (len_check == -1);
+      overlap_check = check_overlapped_word(x, y, dir, dist, len_word, board, words[w]);
+    }
+
     switch (dir)
     {
     case 1:
       /* Check if there will be an overlap of characters */
-      if (x + len_word > 14)
-      {
-        do
-        {
-          x = rand() % 15;
-          y = rand() % 15;
-        } while (x + len_word > 14);
-      }
-
-      for (i = 0; i < len_word; i++)
-      {
-        if (board[temp_y][temp_x] != '\0')
-        {
-          do
-          {
-            x = rand() % 15;
-            y = rand() % 15;
-          } while (x + len_word > 14);
-        }
-        temp_x++;
-      }
-      left_to_right(board, word, x, y);
+      left_to_right(board, word, temp_x, temp_y);
       break;
 
     case 2:
       /* Place the word from right to left */
-      if (x - len_word < 0)
-      {
-        do
-        {
-          x = rand() % 15;
-          y = rand() % 15;
-        } while (x - len_word < 0);
-      }
-
-      for (int i = 0; i < len_word; i++)
-      {
-        if (board[temp_y][temp_x] != '\0')
-        {
-          do
-          {
-            x = rand() % 15;
-            y = rand() % 15;
-          } while (x - len_word < 0);
-        }
-        temp_x--;
-      }
-      right_to_left(board, word, x, y);
+      right_to_left(board, word, temp_x, temp_y);
       break;
 
     case 3:
       /* Place the word downwards */
-      if (y + len_word > 14)
-      {
-        do
-        {
-          x = rand() % 15;
-          y = rand() % 15;
-        } while (y + len_word > 14);
-      }
-
-      for (int i = 0; i < len_word; i++)
-      {
-        if (board[temp_y][temp_x] != '\0')
-        {
-          do
-          {
-            x = rand() % 15;
-            y = rand() % 15;
-          } while (y + len_word > 14);
-        }
-        temp_y++;
-      }
-      downwards(board, word, x, y);
+      downwards(board, word, temp_x, temp_y);
       break;
 
     case 4:
       /* Place the word upwards */
-      if (y - len_word < 0)
-      {
-        do
-        {
-          x = rand() % 15;
-          y = rand() % 15;
-        } while (y - len_word < 0);
-      }
-
-      for (int i = 0; i < len_word; i++)
-      {
-        if (board[temp_y][temp_x] != '\0')
-        {
-          do
-          {
-            x = rand() % 15;
-            y = rand() % 15;
-          } while (y - len_word < 0);
-        }
-        temp_y--;
-      }
-      upwards(board, word, x, y);
+      upwards(board, word, temp_x, temp_y);
       break;
     case 5:
       /* Place the word downwards diagonal, from left to right */
-      if (y + len_word > 14 || x + len_word > 14)
-      {
-        do
-        {
-          x = rand() % 15;
-          y = rand() % 15;
-        } while (y + len_word > 14 || x + len_word > 14);
-      }
-
-      for (int i = 0; i < len_word; i++)
-      {
-        if (board[temp_y][temp_x] != '\0')
-        {
-          do
-          {
-            x = rand() % 15;
-            y = rand() % 15;
-          } while (y + len_word > 14 || x + len_word > 14);
-        }
-        temp_x++;
-        temp_y++;
-      }
-      diag_down_left_to_right(board, word, x, y);
+      diag_down_left_to_right(board, word, temp_x, temp_y);
       break;
 
     case 6:
       /* Place the word downwards diagonal, from right to left */
-      if (y + len_word > 14 || x - len_word < 0)
-      {
-        do
-        {
-          x = rand() % 15;
-          y = rand() % 15;
-        } while (y + len_word > 14 || x - len_word < 0);
-      }
-
-      for (int i = 0; i < len_word; i++)
-      {
-        if (board[temp_y][temp_x] != '\0')
-        {
-          do
-          {
-            x = rand() % 15;
-            y = rand() % 15;
-          } while (y + len_word > 14 || x - len_word < 0);
-        }
-        temp_y++;
-        temp_y--;
-      }
-      diag_down_right_to_left(board, word, x, y);
+      diag_down_right_to_left(board, word, temp_x, temp_y);
       break;
 
     case 7:
       /* Place the word upwards diagonal, from left to right */
-      if (y + len_word > 14 || x + len_word > 14)
-      {
-        do
-        {
-          x = rand() % 15;
-          y = rand() % 15;
-        } while (y + len_word > 14 || x + len_word > 14);
-      }
-
-      for (int i = 0; i < len_word; i++)
-      {
-        if (board[temp_y][temp_x] != '\0')
-        {
-          do
-          {
-            x = rand() % 15;
-            y = rand() % 15;
-          } while (y + len_word > 14 || x + len_word > 14);
-        }
-        temp_x++;
-        temp_y--;
-      }
-      diag_up_left_to_right(board, word, x, y);
+      diag_up_left_to_right(board, word, temp_x, temp_y);
       break;
 
     case 8:
       /* Place the word upwards diagonal, from right to left */
-      if (y - len_word < 0 || x - len_word < 0)
-      {
-        do
-        {
-          x = rand() % 15;
-          y = rand() % 15;
-        } while (y - len_word < 0 || x - len_word < 0);
-      }
-
-      for (int i = 0; i < len_word; i++)
-      {
-        if (board[temp_y][temp_x] != '\0')
-        {
-          do
-          {
-            x = rand() % 15;
-            y = rand() % 15;
-          } while (y - len_word < 0 || x - len_word < 0);
-        }
-        temp_x--;
-        temp_y--;
-      }
-      diag_up_right_to_left(board, word, x, y);
-      break;
-
-    default:
+      diag_up_right_to_left(board, word, temp_x, temp_y);
       break;
     }
   }
 
   print_board(board);
   return 0;
+}
+int check_overlapped_word(int x, int y, int dir, int l, int len_word, char board[][COLUMN], char word[MAX_LEN])
+{
+  switch (dir)
+  {
+  case 1:
+    /* From left to right */
+    for (l = 0; l < len_word; l++)
+    {
+      if (board[y][x] != '\0')
+      {
+        return 1;
+      }
+      x++;
+    }
+    break;
+  case 2:
+    /* From right to left */
+    for (l = 0; l < len_word; l++)
+    {
+      if (board[y][x] != '\0')
+      {
+        return 1;
+      }
+      x--;
+    }
+    break;
+  case 3:
+    /* Downwards */
+    for (l = 0; l < len_word; l++)
+    {
+      if (board[y][x] != '\0')
+      {
+        return 1;
+      }
+      y++;
+    }
+    break;
+  case 4:
+    /* Upwards */
+    for (l = 0; l < len_word; l++)
+    {
+      if (board[y][x] != '\0')
+      {
+        return 1;
+      }
+      y--;
+    }
+    break;
+  case 5:
+    /* Downwards diagonal, from left to right */
+    for (l = 0; l < len_word; l++)
+    {
+      if (board[y][x] != '\0')
+      {
+        return 1;
+      }
+      x++;
+      y++;
+    }
+    break;
+  case 6:
+    /* Downwards diagonal, from right to left */
+    for (l = 0; l < len_word; l++)
+    {
+      if (board[y][x] != '\0')
+      {
+        return 1;
+      }
+      x--;
+      y++;
+    }
+    break;
+  case 7:
+    /* Upwards diagonal, from left to right */
+    for (l = 0; l < len_word; l++)
+    {
+      if (board[y][x] != '\0')
+      {
+        return 1;
+      }
+      x++;
+      y--;
+    }
+    break;
+  case 8:
+    /* Upwards diagonal, from right to left */
+    for (l = 0; l < len_word; l++)
+    {
+      if (board[y][x] != '\0')
+      {
+        return 1;
+      }
+      x--;
+      y--;
+    }
+    break;
+  }
+  return 0;
+}
+void delete_overlapping_word(int x, int y, int dist, int dir, char board[][COLUMN])
+{
+  switch (dir)
+  {
+  case 1:
+    // delete from right to left
+    x--;
+    for (int i = 0; i < dist; i++)
+    {
+      board[y][x] = '\0';
+      if (x != 0)
+      {
+        x--;
+      }
+    }
+    break;
+  case 2:
+    // delete from left to right
+    x++;
+    for (int i = 0; i < dist; i++)
+    {
+      board[y][x] = '\0';
+      if (x != 14)
+      {
+        x++;
+      }
+    }
+    break;
+  case 3:
+    // delete upwards
+    y--;
+    for (int i = 0; i < dist; i++)
+    {
+      board[y][x] = '\0';
+      if (y != 0)
+      {
+        y--;
+      }
+    }
+    break;
+  case 4:
+    // delete downwards
+    y++;
+    for (int i = 0; i < dist; i++)
+    {
+      board[y][x] = '\0';
+      if (y != 14)
+      {
+        y++;
+      }
+    }
+    break;
+  case 5:
+    /* Delete upwards diagonal, from right to left */
+    y--;
+    x--;
+    for (int i = 0; i < dist; i++)
+    {
+      board[y][x] = '\0';
+      if (y != 0 && x != 0)
+      {
+        y--;
+        x--;
+      }
+    }
+    break;
+  case 6:
+    /* Delete upwards diagonal, from left to right */
+    y--;
+    x++;
+    for (int i = 0; i < dist; i++)
+    {
+      board[y][x] = '\0';
+      if (y != 0 && x != 14)
+      {
+        y--;
+        x++;
+      }
+    }
+    break;
+  case 7:
+    /* Delete downwards diagonal, from right to left */
+    y++;
+    x--;
+    for (int i = 0; i < dist; i++)
+    {
+      board[y][x] = '\0';
+      if (y != 14 && x != 0)
+      {
+        y++;
+        x--;
+      }
+    }
+    break;
+  case 8:
+    /* Delete downwards diagonal, from left to right */
+    y++;
+    x++;
+    for (int i = 0; i < dist; i++)
+    {
+      board[y][x] = '\0';
+      if (y != 14 && x != 14)
+      {
+        y++;
+        x++;
+      }
+    }
+    break;
+  }
+}
+int check_len(int x, int y, int len_word, int dir)
+{
+  switch (dir)
+  {
+  case 1:
+    // from left to right
+    if (x + len_word > 14)
+    {
+      return -1;
+    }
+    else
+    {
+      return 1;
+    }
+    break;
+  case 2:
+    // from right to left
+    if (x - len_word < 0)
+    {
+      return -1;
+    }
+    else
+    {
+      return 1;
+    }
+    break;
+  case 3:
+    // downwards
+    if (y + len_word > 14)
+    {
+      return -1;
+    }
+    else
+    {
+      return 1;
+    }
+    break;
+  case 4:
+    // upwards
+    if (y - len_word < 0)
+    {
+      return -1;
+    }
+    else
+    {
+      return 1;
+    }
+    break;
+  case 5:
+    // downwards diagonal, from left to right
+    if (x + len_word > 14 || y + len_word > 14)
+    {
+      return -1;
+    }
+    else
+    {
+      return 1;
+    }
+    break;
+  case 6:
+    // downwards diagonal, from right to left
+    if (x - len_word < 0 || y + len_word > 14)
+    {
+      return -1;
+    }
+    else
+    {
+      return 1;
+    }
+    break;
+  case 7:
+    // upwards diagonal, from left to right
+    if (x + len_word > 14 || y - len_word < 0)
+    {
+      return -1;
+    }
+    else
+    {
+      return 1;
+    }
+    break;
+  case 8:
+    // upwards diagonal, from right to left
+    if (x - len_word < 0 || y - len_word < 0)
+    {
+      return -1;
+    }
+    else
+    {
+      return 1;
+    }
+    break;
+  }
 }
 
 void pick_words(char words[][MAX_LEN], int num_lines, FILE *fp)
