@@ -26,7 +26,7 @@ int main()
 {
   /* Open the file */
   FILE *fp;
-  fp = fopen("wordlist.txt", "rw");
+  fp = fopen("wordlist.txt", "r");
 
   /* Find the number of lines in the txt file */
   char c;
@@ -43,12 +43,14 @@ int main()
   char words[NUM_WORDS][MAX_LEN];
 
   pick_words(words, num_lines, fp);
-
+  fclose(fp);
+  /*
   for (int i = 0; i < NUM_WORDS; i++)
   {
     printf("%d. word: %s", i + 1, words[i]);
     printf("\n");
   }
+  */
 
   /* Place the words */
   int dir;  /* Direction in which word to be placed */
@@ -320,7 +322,7 @@ void delete_overlapping_word(int x, int y, int dist, int dir, char board[][COLUM
     for (int i = 0; i < dist; i++)
     {
       board[y][x] = '\0';
-      if (y != 0 && x != 0)
+      if (y != 0 || x != 0)
       {
         y--;
         x--;
@@ -334,7 +336,7 @@ void delete_overlapping_word(int x, int y, int dist, int dir, char board[][COLUM
     for (int i = 0; i < dist; i++)
     {
       board[y][x] = '\0';
-      if (y != 0 && x != 14)
+      if (y != 0 || x != 14)
       {
         y--;
         x++;
@@ -362,7 +364,7 @@ void delete_overlapping_word(int x, int y, int dist, int dir, char board[][COLUM
     for (int i = 0; i < dist; i++)
     {
       board[y][x] = '\0';
-      if (y != 14 && x != 14)
+      if (y != 14 || x != 14)
       {
         y++;
         x++;
@@ -484,15 +486,21 @@ void pick_words(char words[][MAX_LEN], int num_lines, FILE *fp)
     }
     fscanf(fp, "%s", rand_word);
     strcpy(words[w], rand_word); /* Put the random word in the array */
-    for (int i = 0; i < w; i++)
+
+    int i = 0;
+    while (i < w)
     {
       while (strcmp(words[i], words[w]) == 0)
       {
         pick_words(&words[w], num_lines, fp);
       }
+      i++;
     }
   }
-  fclose(fp);
+  for (size_t i = 0; i < NUM_WORDS; i++)
+  {
+    printf("%s\n", words[i]);
+  }
 }
 void print_board(char board[][COLUMN])
 {
