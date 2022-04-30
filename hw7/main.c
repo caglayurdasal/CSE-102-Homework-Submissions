@@ -65,73 +65,92 @@ int main()
     }
   }
 
-  /*  */
   for (int w = 0; w < NUM_WORDS; w++)
   {
     int i, j, len_check;
     char word[MAX_LEN];
     int len_word = strlen(words[w]); /* Length of one word */
-    printf("Len of %d. word: %d\n", w + 1, len_word);
+    // printf("Len of %d. word: %d\n", w + 1, len_word);
 
     /* Check if there will be an overlap of characters or overflow due to length of word */
     int dist = 0;
+    x = rand() % 15;
+    y = rand() % 15;
+    temp_x = x;
+    temp_y = y;
+    dir = rand() % 8 + 1; /* Direction in which word will be placed */
     int overlap_check = check_overlapped_word(x, y, dir, dist, len_word, board, words[w]);
-    while (overlap_check == 1)
+    if (overlap_check == 1)
     {
-      delete_overlapping_word(x, y, dist, dir, board);
-      do
+      while (overlap_check == 1)
       {
-        /* Start point of the word */
-        x = rand() % 15;
-        y = rand() % 15;
-        temp_x = x;
-        temp_y = y;
-        dir = rand() % 8 + 1; /* Direction in which word will be placed */
-        len_check = check_len(x, y, len_word, dir);
-      } while (len_check == -1);
-      overlap_check = check_overlapped_word(x, y, dir, dist, len_word, board, words[w]);
+        delete_overlapping_word(x, y, dist, dir, board);
+        do
+        {
+          /* Start point of the word */
+          x = rand() % 15;
+          y = rand() % 15;
+          temp_x = x;
+          temp_y = y;
+          dir = rand() % 8 + 1; /* Direction in which word will be placed */
+          len_check = check_len(x, y, len_word, dir);
+        } while (len_check == -1);
+        overlap_check = check_overlapped_word(x, y, dir, dist, len_word, board, words[w]);
+      }
     }
 
     switch (dir)
     {
     case 1:
       /* Check if there will be an overlap of characters */
-      left_to_right(board, word, temp_x, temp_y);
+      left_to_right(board, words[w], temp_x, temp_y);
       break;
 
     case 2:
       /* Place the word from right to left */
-      right_to_left(board, word, temp_x, temp_y);
+      right_to_left(board, words[w], temp_x, temp_y);
       break;
 
     case 3:
       /* Place the word downwards */
-      downwards(board, word, temp_x, temp_y);
+      downwards(board, words[w], temp_x, temp_y);
       break;
 
     case 4:
       /* Place the word upwards */
-      upwards(board, word, temp_x, temp_y);
+      upwards(board, words[w], temp_x, temp_y);
       break;
     case 5:
       /* Place the word downwards diagonal, from left to right */
-      diag_down_left_to_right(board, word, temp_x, temp_y);
+      diag_down_left_to_right(board, words[w], temp_x, temp_y);
       break;
 
     case 6:
       /* Place the word downwards diagonal, from right to left */
-      diag_down_right_to_left(board, word, temp_x, temp_y);
+      diag_down_right_to_left(board, words[w], temp_x, temp_y);
       break;
 
     case 7:
       /* Place the word upwards diagonal, from left to right */
-      diag_up_left_to_right(board, word, temp_x, temp_y);
+      diag_up_left_to_right(board, words[w], temp_x, temp_y);
       break;
 
     case 8:
       /* Place the word upwards diagonal, from right to left */
-      diag_up_right_to_left(board, word, temp_x, temp_y);
+      diag_up_right_to_left(board, words[w], temp_x, temp_y);
       break;
+    }
+  }
+
+  for (int r = 0; r < ROW; r++)
+  {
+    for (int c = 0; c < COLUMN; c++)
+    {
+      if (board[r][c] == '\0')
+      {
+        board[r][c] = '.';
+        // board[r][c] = (char)(97 + rand() % 26);
+      }
     }
   }
 
@@ -140,6 +159,11 @@ int main()
 }
 int check_overlapped_word(int x, int y, int dir, int l, int len_word, char board[][COLUMN], char word[MAX_LEN])
 {
+  int len_check = check_len(x, y, len_word, dir);
+  if (len_check == -1)
+  {
+    return 1;
+  }
   switch (dir)
   {
   case 1:
@@ -477,6 +501,7 @@ void print_board(char board[][COLUMN])
   {
     for (int j = 0; j < COLUMN; j++)
     {
+
       printf("%c ", board[i][j]);
     }
     printf("\n");
@@ -488,6 +513,7 @@ void left_to_right(char board[][COLUMN], char word[MAX_LEN], int x, int y)
   int len_word = strlen(word);
   for (int i = 0; i < len_word; i++)
   {
+
     board[y][x] = word[i];
     x++;
   }
@@ -506,6 +532,7 @@ void downwards(char board[][COLUMN], char word[MAX_LEN], int x, int y)
   int len_word = strlen(word);
   for (int i = 0; i < len_word; i++)
   {
+
     board[y][x] = word[i];
     y++;
   }
@@ -515,6 +542,7 @@ void upwards(char board[][COLUMN], char word[MAX_LEN], int x, int y)
   int len_word = strlen(word);
   for (int i = 0; i < len_word; i++)
   {
+
     board[y][x] = word[i];
     y--;
   }
@@ -524,6 +552,7 @@ void diag_up_left_to_right(char board[][COLUMN], char word[MAX_LEN], int x, int 
   int len_word = strlen(word);
   for (int i = 0; i < len_word; i++)
   {
+
     board[y][x] = word[i];
     x++;
     y--;
@@ -534,6 +563,7 @@ void diag_up_right_to_left(char board[][COLUMN], char word[MAX_LEN], int x, int 
   int len_word = strlen(word);
   for (int i = 0; i < len_word; i++)
   {
+
     board[y][x] = word[i];
     x--;
     y--;
@@ -544,6 +574,7 @@ void diag_down_left_to_right(char board[][COLUMN], char word[MAX_LEN], int x, in
   int len_word = strlen(word);
   for (int i = 0; i < len_word; i++)
   {
+
     board[y][x] = word[i];
     x++;
     y++;
@@ -554,6 +585,7 @@ void diag_down_right_to_left(char board[][COLUMN], char word[MAX_LEN], int x, in
   int len_word = strlen(word);
   for (int i = 0; i < len_word; i++)
   {
+
     board[y][x] = word[i];
     x--;
     y++;
