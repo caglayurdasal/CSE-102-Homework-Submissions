@@ -9,10 +9,18 @@
 #define COLUMN 15   /* Number of columns, x-axis, of the board */
 
 void pick_words(char words[][MAX_LEN], int num_lines, FILE *fp);
+void print_board(char board[][COLUMN]);
+void left_to_right(char board[][COLUMN], char word[MAX_LEN], int x, int y);
+void right_to_left(char board[][COLUMN], char word[MAX_LEN], int x, int y);
+void downwards(char board[][COLUMN], char word[MAX_LEN], int x, int y);
+void upwards(char board[][COLUMN], char word[MAX_LEN], int x, int y);
+void diag_up_left_to_right(char board[][COLUMN], char word[MAX_LEN], int x, int y);
+void diag_up_right_to_left(char board[][COLUMN], char word[MAX_LEN], int x, int y);
+void diag_down_left_to_right(char board[][COLUMN], char word[MAX_LEN], int x, int y);
+void diag_down_right_to_left(char board[][COLUMN], char word[MAX_LEN], int x, int y);
+
 int main()
 {
-  char words[NUM_WORDS][MAX_LEN];
-
   /* Open the file */
   FILE *fp;
   fp = fopen("wordlist.txt", "rw");
@@ -34,7 +42,11 @@ int main()
       break;
     }
   }
+
+  char words[NUM_WORDS][MAX_LEN];
+
   pick_words(words, num_lines, fp);
+
   for (int i = 0; i < NUM_WORDS; i++)
   {
     printf("%d. word: %s", i + 1, words[i]);
@@ -51,148 +63,223 @@ int main()
   {
     for (int j = 0; j < COLUMN; j++)
     {
-      strcpy(&board[i][j], "0");
+      board[i][j] = '0';
     }
   }
 
   for (int w = 0; w < NUM_WORDS; w++)
   {
-    /* Decide the start point of the word */
-    x = rand() % 15 + 1;
-    y = rand() % 15 + 1;
-    temp_x = x;
-    temp_y = y;
     int i, j, check = 1;
     char word[MAX_LEN];
-
+    int len_word = strlen(word);
     strcpy(word, words[w]);
 
     while (check)
     {
       /* Decide the direction */
       dir = rand() % 8 + 1;
-
+      /* Decide the start point of the word */
+      x = rand() % 15;
+      y = rand() % 15;
+      temp_x = x;
+      temp_y = y;
       switch (dir)
       {
       case 1:
         /* Check if there will be an overlap of characters */
-        for (i = 0; i < strlen(word) - 2; i++)
+        if (x + len_word > 14)
         {
-
-          if (board[temp_y][temp_x] != '0')
+          check = 1;
+          break;
+        }
+        else
+        {
+          for (i = 0; i < len_word; i++)
           {
-            check = 1;
-            break;
+            if (board[temp_y][temp_x] != '0')
+            {
+              check = 1;
+              break;
+            }
+            else
+            {
+              temp_x++;
+              check = 0;
+            }
           }
-          temp_x++;
-          check = 0;
+          left_to_right(board, word, x, y);
+          break;
         }
-        /* Place the word letter by letter */
-        for (i = 0; i < strlen(word) - 2; i++)
-        {
-          board[y][x] = word[i];
-          x++;
-        }
-        break;
+
       case 2:
         /* Place the word from right to left */
-        for (int i = 0; i < strlen(word) - 2; i++)
+        if (x - len_word < 0)
         {
-          if (board[y][x] != '0')
-          {
-            break;
-          }
-          x++;
+          check = 1;
+          break;
         }
-        break;
+        else
+        {
+          for (int i = 0; i < len_word; i++)
+          {
+            if (board[temp_y][temp_x] != '0')
+            {
+              check = 1;
+              break;
+            }
+            temp_x--;
+            check = 0;
+          }
+          right_to_left(board, word, x, y);
+          break;
+        }
       case 3:
         /* Place the word downwards */
-        for (int i = 0; i < strlen(word) - 2; i++)
+        if (y + len_word > 14)
         {
-          if (board[y][x] != '0')
-          {
-            break;
-          }
-          x++;
+          check = 1;
+          break;
         }
-        break;
+        else
+        {
+          for (int i = 0; i < len_word; i++)
+          {
+            if (board[temp_y][temp_x] != '0')
+            {
+              check = 1;
+              break;
+            }
+            temp_y++;
+            check = 0;
+          }
+          downwards(board, word, x, y);
+          break;
+        }
       case 4:
-        /* Place the word from upwards */
-        for (int i = 0; i < strlen(word) - 2; i++)
+        /* Place the word upwards */
+        if (y - len_word < 0)
         {
-          if (board[y][x] != '0')
-          {
-            break;
-          }
-          x++;
+          check = 1;
+          break;
         }
+        else
+        {
+          for (int i = 0; i < len_word; i++)
+          {
+            if (board[temp_y][temp_x] != '0')
+            {
+              check = 1;
+              break;
+            }
+            temp_y--;
+            check = 0;
+          }
+        }
+        upwards(board, word, x, y);
         break;
       case 5:
         /* Place the word downwards diagonal, from left to right */
-        for (int i = 0; i < strlen(word) - 2; i++)
+        if (y + len_word > 14 || x + len_word > 14)
         {
-          if (board[y][x] != '0')
-          {
-            break;
-          }
-          x++;
+          check = 1;
+          break;
         }
-        break;
+        else
+        {
+          for (int i = 0; i < len_word; i++)
+          {
+            if (board[temp_y][temp_x] != '0')
+            {
+              check = 1;
+              break;
+            }
+            temp_x++;
+            temp_y++;
+            check = 0;
+          }
+          diag_down_left_to_right(board, word, x, y);
+          break;
+        }
       case 6:
         /* Place the word downwards diagonal, from right to left */
-        for (int i = 0; i < strlen(word) - 2; i++)
+        if (y + len_word > 14 || x - len_word < 0)
         {
-          if (board[y][x] != '0')
-          {
-            break;
-          }
-          x++;
+          check = 1;
+          break;
         }
-        break;
+        else
+        {
+          for (int i = 0; i < len_word; i++)
+          {
+            if (board[temp_y][temp_x] != '0')
+            {
+              check = 1;
+              break;
+            }
+            temp_y++;
+            temp_y--;
+            check = 0;
+          }
+          diag_down_right_to_left(board, word, x, y);
+          break;
+        }
       case 7:
         /* Place the word upwards diagonal, from left to right */
-        for (int i = 0; i < strlen(word) - 2; i++)
+        if (y + len_word > 14 || x + len_word > 14)
         {
-          if (board[y][x] != '0')
-          {
-            break;
-          }
-          x++;
+          check = 1;
+          break;
         }
-        break;
+        else
+        {
+          for (int i = 0; i < len_word; i++)
+          {
+            if (board[temp_y][temp_x] != '0')
+            {
+              check = 1;
+              break;
+            }
+            temp_x++;
+            temp_y--;
+            check = 0;
+          }
+          diag_up_left_to_right(board, word, x, y);
+          break;
+        }
       case 8:
         /* Place the word upwards diagonal, from right to left */
-        for (int i = 0; i < strlen(word) - 2; i++)
+        if (y - len_word < 0 || x - len_word < 0)
         {
-          if (board[y][x] != '0')
-          {
-            break;
-          }
-          x++;
+          check = 1;
+          break;
         }
-        break;
+        else
+        {
+          for (int i = 0; i < len_word; i++)
+          {
+            if (board[temp_y][temp_x] != '0')
+            {
+              check = 1;
+              break;
+            }
+            temp_x--;
+            temp_y--;
+            check = 0;
+          }
+          diag_up_right_to_left(board, word, x, y);
+          break;
+        }
       default:
         break;
       }
+      break;
     }
   }
 
-  /* Start placing the word */
-  // printf("%d. word: %s", w + 1, word);
-  // printf("Start point of %d. word: x=%d, y=%d\n", w + 1, x, y); // for debugging
-  // printf("Direction of %d. word: %d\n", w + 1, dir);            // for debugging
-
-  for (int i = 0; i < ROW; i++)
-  {
-    for (int j = 0; j < COLUMN; j++)
-    {
-      printf("%c ", board[i][j]);
-    }
-    printf("\n");
-  }
-
+  print_board(board);
   return 0;
 }
+
 void pick_words(char words[][MAX_LEN], int num_lines, FILE *fp)
 {
   /* Pick 7 random words and store them in an array */
@@ -219,4 +306,93 @@ void pick_words(char words[][MAX_LEN], int num_lines, FILE *fp)
     }
   }
   fclose(fp);
+}
+void print_board(char board[][COLUMN])
+{
+  printf("\n");
+  for (int i = 0; i < ROW; i++)
+  {
+    for (int j = 0; j < COLUMN; j++)
+    {
+      printf("%c ", board[i][j]);
+    }
+    printf("\n");
+  }
+}
+
+void left_to_right(char board[][COLUMN], char word[MAX_LEN], int x, int y)
+{
+  int len_word = strlen(word);
+  for (int i = 0; i < len_word; i++)
+  {
+    board[y][x] = word[i];
+    x++;
+  }
+}
+void right_to_left(char board[][COLUMN], char word[MAX_LEN], int x, int y)
+{
+  int len_word = strlen(word);
+  for (int i = 0; i < len_word; i++)
+  {
+    board[y][x] = word[i];
+    x--;
+  }
+}
+void downwards(char board[][COLUMN], char word[MAX_LEN], int x, int y)
+{
+  int len_word = strlen(word);
+  for (int i = 0; i < len_word; i++)
+  {
+    board[y][x] = word[i];
+    y++;
+  }
+}
+void upwards(char board[][COLUMN], char word[MAX_LEN], int x, int y)
+{
+  int len_word = strlen(word);
+  for (int i = 0; i < len_word; i++)
+  {
+    board[y][x] = word[i];
+    y--;
+  }
+}
+void diag_up_left_to_right(char board[][COLUMN], char word[MAX_LEN], int x, int y)
+{
+  int len_word = strlen(word);
+  for (int i = 0; i < len_word; i++)
+  {
+    board[y][x] = word[i];
+    x++;
+    y--;
+  }
+}
+void diag_up_right_to_left(char board[][COLUMN], char word[MAX_LEN], int x, int y)
+{
+  int len_word = strlen(word);
+  for (int i = 0; i < len_word; i++)
+  {
+    board[y][x] = word[i];
+    x--;
+    y--;
+  }
+}
+void diag_down_left_to_right(char board[][COLUMN], char word[MAX_LEN], int x, int y)
+{
+  int len_word = strlen(word);
+  for (int i = 0; i < len_word; i++)
+  {
+    board[y][x] = word[i];
+    x++;
+    y++;
+  }
+}
+void diag_down_right_to_left(char board[][COLUMN], char word[MAX_LEN], int x, int y)
+{
+  int len_word = strlen(word);
+  for (int i = 0; i < len_word; i++)
+  {
+    board[y][x] = word[i];
+    x--;
+    y++;
+  }
 }
