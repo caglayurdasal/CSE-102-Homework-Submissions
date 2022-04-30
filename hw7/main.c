@@ -8,8 +8,11 @@
 #define ROW 15      /* Number of rows, y-axis, of the board */
 #define COLUMN 15   /* Number of columns, x-axis, of the board */
 
+void pick_words(char words[][MAX_LEN], int num_lines, FILE *fp);
 int main()
 {
+  char words[NUM_WORDS][MAX_LEN];
+
   /* Open the file */
   FILE *fp;
   fp = fopen("wordlist.txt", "rw");
@@ -31,25 +34,7 @@ int main()
       break;
     }
   }
-
-  /* Pick 7 random words and store them in an array */
-  int line_rand_word;
-  char rand_word[MAX_LEN];
-  char words[NUM_WORDS][MAX_LEN];
-
-  srand((unsigned)time(NULL)); /* Seed */
-  for (int w = 0; w < NUM_WORDS; w++)
-  {
-    fseek(fp, 0, SEEK_SET);                  /* Move pointer to the start */
-    line_rand_word = rand() % num_lines + 1; /* Pick a random line to be read */
-
-    for (int l = 0; l < line_rand_word; l++)
-    {
-      fgets(rand_word, sizeof(rand_word), fp); /* Update the word that is read until target line is reached */
-    }
-    strcpy(words[w], rand_word); /* Put the random word in the array */
-  }
-  fclose(fp);
+  pick_words(words, num_lines, fp);
   for (int i = 0; i < NUM_WORDS; i++)
   {
     printf("%d. word: %s", i + 1, words[i]);
@@ -86,12 +71,14 @@ int main()
     {
       /* Decide the direction */
       dir = rand() % 8 + 1;
+
       switch (dir)
       {
       case 1:
         /* Check if there will be an overlap of characters */
         for (i = 0; i < strlen(word) - 2; i++)
         {
+
           if (board[temp_y][temp_x] != '0')
           {
             check = 1;
@@ -189,6 +176,7 @@ int main()
       }
     }
   }
+
   /* Start placing the word */
   // printf("%d. word: %s", w + 1, word);
   // printf("Start point of %d. word: x=%d, y=%d\n", w + 1, x, y); // for debugging
@@ -204,4 +192,31 @@ int main()
   }
 
   return 0;
+}
+void pick_words(char words[][MAX_LEN], int num_lines, FILE *fp)
+{
+  /* Pick 7 random words and store them in an array */
+  int line_rand_word;
+  char rand_word[MAX_LEN];
+
+  srand((unsigned)time(NULL)); /* Seed */
+  for (int w = 0; w < NUM_WORDS; w++)
+  {
+    fseek(fp, 0, SEEK_SET);                  /* Move pointer to the start */
+    line_rand_word = rand() % num_lines + 1; /* Pick a random line to be read */
+
+    for (int l = 0; l < line_rand_word; l++)
+    {
+      fgets(rand_word, sizeof(rand_word), fp); /* Update the word that is read until target line is reached */
+    }
+    strcpy(words[w], rand_word); /* Put the random word in the array */
+    for (int i = 0; i < w; i++)
+    {
+      while (words[i] == words[w])
+      {
+        pick_words(&words[w], num_lines, fp);
+      }
+    }
+  }
+  fclose(fp);
 }
