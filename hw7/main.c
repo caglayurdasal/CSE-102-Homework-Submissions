@@ -21,7 +21,14 @@ void diag_down_right_to_left(char board[][COLUMN], char word[MAX_LEN], int x, in
 int check_len(int x, int y, int len_word, int dir);
 int check_overlapped_word(int x, int y, int dir, int l, int len_word, char board[][COLUMN], char word[MAX_LEN]);
 void delete_overlapping_word(int x, int y, int dist, int dir, char board[][COLUMN]);
-
+void yellow()
+{
+  printf("\033[1;33m");
+}
+void reset()
+{
+  printf("\033[0m");
+}
 int main()
 {
   /* Open the file */
@@ -507,8 +514,16 @@ void print_board(char board[][COLUMN])
   {
     for (int j = 0; j < COLUMN; j++)
     {
-
+      if (board[i][j] != '.')
+      {
+        yellow();
+      }
+      else
+      {
+        board[i][j] = (char)(97 + rand() % 26);
+      }
       printf("%c ", board[i][j]);
+      reset();
     }
     printf("\n");
   }
