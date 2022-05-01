@@ -160,27 +160,10 @@ int main()
   char buffer[50];
   while (foundedWords < 7 && mistakes < 3)
   {
-    printf("Enter raw (y-coordinate), column (x-coordinate) and word, seperately and respectively: ");
+    printf("Enter raw (y-coordinate), column (x-coordinate) and word, respectively: ");
     scanf("%d", &row);
     scanf("%d", &column);
     scanf("%s", foundWord);
-    // sprintf(buffer, "%d %d %s", stdin, stdin, stdin);
-
-    // if (fgets(buffer, 100, stdin))
-    // {
-    //   buffer[strcspn(buffer, "\n")] = 0;
-    //   sscanf(buffer, "%d %d %s", &row, &column, foundWord);
-    // }
-    // scanf(" %49[^\n]%*c", buffer);
-    // while (c != '\0' || c != '\n')
-    // {
-    //   c == getc(buffer);
-    //   if (c == '\0' || c == '\n')
-    //   {
-    //     len_buff++;
-    //   }
-    // }
-    // snprintf(buffer, len_buff, "%d %d %s", buffer);
 
     if (strcmp(foundWord, ":q") == 0) /* Terminate if user enters :q command */
     {
