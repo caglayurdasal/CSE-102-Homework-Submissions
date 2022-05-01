@@ -21,14 +21,8 @@ void diag_down_right_to_left(char board[][COLUMN], char word[MAX_LEN], int x, in
 int check_len(int x, int y, int len_word, int dir);
 int check_overlapped_word(int x, int y, int dir, int l, int len_word, char board[][COLUMN], char word[MAX_LEN]);
 void delete_overlapping_word(int x, int y, int dist, int dir, char board[][COLUMN]);
-void yellow()
-{
-  printf("\033[1;33m");
-}
-void reset()
-{
-  printf("\033[0m");
-}
+int searchWord(char board[][COLUMN], char word[MAX_LEN], int x, int y, int len);
+
 int main()
 {
   /* Open the file */
@@ -101,7 +95,7 @@ int main()
         overlap_check = check_overlapped_word(x, y, dir, dist, len_word, board, words[w]);
       }
     }
-
+    printf("%d. word: %s [%d,%d]\n", w + 1, words[w], temp_y, temp_x);
     switch (dir)
     {
     case 1:
@@ -152,14 +146,264 @@ int main()
       if (board[r][c] == '\0')
       {
         board[r][c] = '.';
-        // board[r][c] = (char)(97 + rand() % 26);
       }
     }
   }
-
+  /* Display the initial board at the beginning */
   print_board(board);
+  printf("\n");
+  int mistakes = 0, foundedWords = 0; /* Check how many mistakes are done and words are founded */
+  int row, column;                    /* Row and column */
+  char foundWord[MAX_LEN];            /* User entered word */
+  int len;                            /* Length of user entered word */
+  int totalPoints = 0;
+  while (foundedWords < 7 && mistakes < 3) /* Player can only make 3 mistakes */
+  {
+    printf("Enter coordinates and word: ");
+    scanf("%d ", &row);
+    scanf("%d ", &column);
+    scanf("%s", foundWord);
+    if (strcmp(foundWord, ":q") == 0)
+    {
+      printf("You chose to give up:/ Goodbye!\n");
+      printf("Total points: %d\n", totalPoints);
+      return 0;
+    }
+    len = strlen(foundWord);
+    int isfounded = searchWord(board, foundWord, column, row, len);
+    if (!isfounded)
+    {
+      mistakes++;
+      print_board(board);
+      printf("Wrong choice! You have only %d lefts.\n", (3 - mistakes));
+      if (mistakes == 3)
+      {
+        printf("You have lost:( Try better next time!\n");
+        printf("Total points: %d\n", totalPoints);
+      }
+    }
+    else
+    {
+      foundedWords++;
+      totalPoints += 2;
+      print_board(board);
+
+      printf("Founded! You got 2 points. Your total points: %d\n", totalPoints);
+      if (foundedWords == 7)
+      {
+        printf("You have found all the hidden words:) Congrats!\n");
+        printf("Total points: %d\n", totalPoints);
+      }
+    }
+  }
   return 0;
 }
+int searchWord(char board[][COLUMN], char word[MAX_LEN], int x, int y, int len)
+{
+  int found = 0;
+  int temp_x = x, temp_y = y;
+  char xWord[len];
+  for (int i = 0; i < len; i++)
+  {
+    xWord[i] = 'X';
+  }
+
+  /* Search from left to right */
+  for (int i = 0; i < len; i++)
+  {
+    if (word[i] == board[y][x])
+    {
+      found = 1;
+    }
+    else
+    {
+      found = 0;
+      break;
+    }
+    x++;
+  }
+  if (found == 1)
+  {
+    x = temp_x;
+    y = temp_y;
+    left_to_right(board, xWord, x, y);
+    return 1;
+  }
+
+  /* Search from right to left */
+  x = temp_x;
+  y = temp_y;
+  for (int i = 0; i < len; i++)
+  {
+    if (word[i] == board[y][x])
+    {
+      found = 1;
+    }
+    else
+    {
+      found = 0;
+      break;
+    }
+    x--;
+  }
+  if (found == 1)
+  {
+    x = temp_x;
+    y = temp_y;
+    right_to_left(board, xWord, x, y);
+    return 1;
+  }
+
+  /* Search downwards */
+  x = temp_x;
+  y = temp_y;
+  for (int i = 0; i < len; i++)
+  {
+    if (word[i] == board[y][x])
+    {
+      found = 1;
+    }
+    else
+    {
+      found = 0;
+      break;
+    }
+    y++;
+  }
+  if (found == 1)
+  {
+    x = temp_x;
+    y = temp_y;
+    downwards(board, xWord, x, y);
+    return 1;
+  }
+
+  /* Search upwards */
+  x = temp_x;
+  y = temp_y;
+  for (int i = 0; i < len; i++)
+  {
+    if (word[i] == board[y][x])
+    {
+      found = 1;
+    }
+    else
+    {
+      found = 0;
+      break;
+    }
+    y--;
+  }
+  if (found == 1)
+  {
+    x = temp_x;
+    y = temp_y;
+    upwards(board, xWord, x, y);
+    return 1;
+  }
+
+  /* Search upwards diagonal, from right to left */
+  x = temp_x;
+  y = temp_y;
+  for (int i = 0; i < len; i++)
+  {
+    if (word[i] == board[y][x])
+    {
+      found = 1;
+    }
+    else
+    {
+      found = 0;
+      break;
+    }
+    y--;
+    x--;
+  }
+  if (found == 1)
+  {
+    x = temp_x;
+    y = temp_y;
+    diag_up_right_to_left(board, xWord, x, y);
+    return 1;
+  }
+
+  /* Search upwards diagonal, from left to right */
+  x = temp_x;
+  y = temp_y;
+  for (int i = 0; i < len; i++)
+  {
+    if (word[i] == board[y][x])
+    {
+      found = 1;
+    }
+    else
+    {
+      found = 0;
+      break;
+    }
+    x++;
+    y--;
+  }
+  if (found == 1)
+  {
+    x = temp_x;
+    y = temp_y;
+    diag_up_left_to_right(board, xWord, x, y);
+    return 1;
+  }
+
+  /* Search downwards diagonal, from left to right */
+  x = temp_x;
+  y = temp_y;
+  for (int i = 0; i < len; i++)
+  {
+    if (word[i] == board[y][x])
+    {
+      found = 1;
+    }
+    else
+    {
+      found = 0;
+      break;
+    }
+    x++;
+    y++;
+  }
+  if (found == 1)
+  {
+    x = temp_x;
+    y = temp_y;
+    diag_down_left_to_right(board, xWord, x, y);
+    return 1;
+  }
+
+  /* Search downwards diagonal, from right to left */
+  x = temp_x;
+  y = temp_y;
+  for (int i = 0; i < len; i++)
+  {
+    if (word[i] == board[y][x])
+    {
+      found = 1;
+    }
+    else
+    {
+      found = 0;
+      break;
+    }
+    x--;
+    y++;
+  }
+  if (found == 1)
+  {
+    x = temp_x;
+    y = temp_y;
+    diag_down_right_to_left(board, xWord, x, y);
+    return 1;
+  }
+  return 0;
+}
+
 int check_overlapped_word(int x, int y, int dir, int l, int len_word, char board[][COLUMN], char word[MAX_LEN])
 {
   int len_check = check_len(x, y, len_word, dir);
@@ -482,7 +726,6 @@ void pick_words(char words[][MAX_LEN], int num_lines, FILE *fp)
     {
       fseek(fp, 0, SEEK_SET);                  /* Move pointer to the start */
       line_rand_word = rand() % num_lines + 1; /* Pick a random line to be read */
-      printf("%d. word rand line: %d\n", w + 1, line_rand_word);
 
       for (int line = 0; line < line_rand_word; line++)
       {
@@ -502,8 +745,6 @@ void pick_words(char words[][MAX_LEN], int num_lines, FILE *fp)
           flag = 0;
         }
       }
-
-      printf("%d. word: %s\n", w + 1, words[w]);
     }
   }
 }
@@ -514,16 +755,15 @@ void print_board(char board[][COLUMN])
   {
     for (int j = 0; j < COLUMN; j++)
     {
-      if (board[i][j] != '.')
+      if (board[i][j] != '.' || board[i][j] == 'X')
       {
-        yellow();
+        printf("%c ", board[i][j]);
       }
       else
       {
         board[i][j] = (char)(97 + rand() % 26);
+        printf("%c ", board[i][j]);
       }
-      printf("%c ", board[i][j]);
-      reset();
     }
     printf("\n");
   }
