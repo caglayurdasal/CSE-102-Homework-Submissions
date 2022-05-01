@@ -67,7 +67,6 @@ int main()
     int i, j, len_check;
     char word[MAX_LEN];
     int len_word = strlen(words[w]); /* Length of one word */
-    // printf("Len of %d. word: %d\n", w + 1, len_word);
 
     /* Check if there will be an overlap of characters or overflow due to length of word */
     int dist = 0;
@@ -155,20 +154,41 @@ int main()
   int mistakes = 0, foundedWords = 0; /* Check how many mistakes are done and words are founded */
   int row, column;                    /* Row and column */
   char foundWord[MAX_LEN];            /* User entered word */
-  int len;                            /* Length of user entered word */
+  int len, len_buff = 0;
+
   int totalPoints = 0;
-  while (foundedWords < 7 && mistakes < 3) /* Player can only make 3 mistakes */
+  char buffer[50];
+  while (foundedWords < 7 && mistakes < 3)
   {
-    printf("Enter coordinates and word: ");
-    scanf("%d ", &row);
-    scanf("%d ", &column);
+    printf("Enter raw (y-coordinate), column (x-coordinate) and word, seperately and respectively: ");
+    scanf("%d", &row);
+    scanf("%d", &column);
     scanf("%s", foundWord);
-    if (strcmp(foundWord, ":q") == 0)
+    // sprintf(buffer, "%d %d %s", stdin, stdin, stdin);
+
+    // if (fgets(buffer, 100, stdin))
+    // {
+    //   buffer[strcspn(buffer, "\n")] = 0;
+    //   sscanf(buffer, "%d %d %s", &row, &column, foundWord);
+    // }
+    // scanf(" %49[^\n]%*c", buffer);
+    // while (c != '\0' || c != '\n')
+    // {
+    //   c == getc(buffer);
+    //   if (c == '\0' || c == '\n')
+    //   {
+    //     len_buff++;
+    //   }
+    // }
+    // snprintf(buffer, len_buff, "%d %d %s", buffer);
+
+    if (strcmp(foundWord, ":q") == 0) /* Terminate if user enters :q command */
     {
       printf("You chose to give up:/ Goodbye!\n");
       printf("Total points: %d\n", totalPoints);
       return 0;
     }
+    /* Search the board, if word is found update the board and score */
     len = strlen(foundWord);
     int isfounded = searchWord(board, foundWord, column, row, len);
     if (!isfounded)
@@ -176,7 +196,7 @@ int main()
       mistakes++;
       print_board(board);
       printf("Wrong choice! You have only %d lefts.\n", (3 - mistakes));
-      if (mistakes == 3)
+      if (mistakes == 3) /* Player can only make 3 mistakes */
       {
         printf("You have lost:( Try better next time!\n");
         printf("Total points: %d\n", totalPoints);
@@ -213,11 +233,13 @@ int searchWord(char board[][COLUMN], char word[MAX_LEN], int x, int y, int len)
   {
     if (word[i] == board[y][x])
     {
-      found = 1;
+      found = 1; /* Keep searching using the current direction
+                    if letters match */
     }
     else
     {
-      found = 0;
+      found = 0; /* If letters don't match, stop searching with current
+                    direction and try next direction */
       break;
     }
     x++;
