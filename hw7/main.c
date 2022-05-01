@@ -1,3 +1,11 @@
+/*
+ * This program is a word puzzle. In each round,
+ * 7 random words are picked from a wordlist and
+ * put randomly in a 15x15 board, along with other
+ * random letters. Player tries to find hidden words
+ * by entering word and start point.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -203,6 +211,13 @@ int main()
 }
 int searchWord(char board[][COLUMN], char word[MAX_LEN], int x, int y, int len)
 {
+  /* This function searches for the user entered word starting from user entered
+   * point on the board.
+   * int x, y: Coordinates of the first letter
+   * int len: Length of the word
+   * char word: Word to be searched for on the board
+   * char board: Game board
+   */
   int found = 0;
   int temp_x = x, temp_y = y;
   char xWord[len];
@@ -411,7 +426,18 @@ int searchWord(char board[][COLUMN], char word[MAX_LEN], int x, int y, int len)
 
 int check_overlapped_word(int x, int y, int dir, int l, int len_word, char board[][COLUMN], char word[MAX_LEN])
 {
+  /* This function checks any word that would cause an overlap of characters.
+   * int x, y: Coordinates of the first letter
+   * int dir: Direction in which the word is placed
+   * char board: Game board
+   * char word: Word whose place to be checked
+   */
+
+  /* Check if the word fits on the board */
   int len_check = check_len(x, y, len_word, dir);
+
+  /* If word does not fit, return 1 to main to delete the placed
+  characters and pick new location and direction */
   if (len_check == -1)
   {
     return 1;
@@ -422,11 +448,11 @@ int check_overlapped_word(int x, int y, int dir, int l, int len_word, char board
     /* From left to right */
     for (l = 0; l < len_word; l++)
     {
-      if (board[y][x] != '\0')
+      if (board[y][x] != '\0') /* If there is a character other than NULL, return to avoid overlap */
       {
         return 1;
       }
-      x++;
+      x++; /* Update only x-coordinate whiling moving from left to right */
     }
     break;
   case 2:
@@ -437,7 +463,7 @@ int check_overlapped_word(int x, int y, int dir, int l, int len_word, char board
       {
         return 1;
       }
-      x--;
+      x--; /* Update only x-coordinate whiling moving from right to left */
     }
     break;
   case 3:
@@ -448,7 +474,7 @@ int check_overlapped_word(int x, int y, int dir, int l, int len_word, char board
       {
         return 1;
       }
-      y++;
+      y++; /* Update only y-coordinate whiling moving downwards */
     }
     break;
   case 4:
@@ -459,7 +485,7 @@ int check_overlapped_word(int x, int y, int dir, int l, int len_word, char board
       {
         return 1;
       }
-      y--;
+      y--; /* Update only y-coordinate whiling moving upwards */
     }
     break;
   case 5:
@@ -470,7 +496,7 @@ int check_overlapped_word(int x, int y, int dir, int l, int len_word, char board
       {
         return 1;
       }
-      x++;
+      x++; /* Update both coordinates whiling moving diagonal */
       y++;
     }
     break;
@@ -482,7 +508,7 @@ int check_overlapped_word(int x, int y, int dir, int l, int len_word, char board
       {
         return 1;
       }
-      x--;
+      x--; /* Update both coordinates whiling moving diagonal */
       y++;
     }
     break;
@@ -494,7 +520,7 @@ int check_overlapped_word(int x, int y, int dir, int l, int len_word, char board
       {
         return 1;
       }
-      x++;
+      x++; /* Update both coordinates whiling moving diagonal */
       y--;
     }
     break;
@@ -506,7 +532,7 @@ int check_overlapped_word(int x, int y, int dir, int l, int len_word, char board
       {
         return 1;
       }
-      x--;
+      x--; /* Update both coordinates whiling moving diagonal */
       y--;
     }
     break;
@@ -515,6 +541,12 @@ int check_overlapped_word(int x, int y, int dir, int l, int len_word, char board
 }
 void delete_overlapping_word(int x, int y, int dist, int dir, char board[][COLUMN])
 {
+  /* This function deletes any word that would cause an overlap of characters.
+   * int x, y: Coordinates of the first letter
+   * int dist: Number of points that the letter moved on the board when it caused overlap
+   * int dir: Direction in which the word is placed
+   * char board: Game board
+   */
   switch (dir)
   {
   case 1:
@@ -625,6 +657,11 @@ void delete_overlapping_word(int x, int y, int dist, int dir, char board[][COLUM
 }
 int check_len(int x, int y, int len_word, int dir)
 {
+  /* This function check whether the word fits on the board
+   * int x, y: Coordinates of the first letter
+   * int len_word: Length of the word
+   * int dir: Direction in which the word to be placed
+   */
   switch (dir)
   {
   case 1:
@@ -720,7 +757,12 @@ int check_len(int x, int y, int len_word, int dir)
 
 void pick_words(char words[][MAX_LEN], int num_lines, FILE *fp)
 {
-  /* Pick 7 random words and store them in an array */
+  /* This function picks random 7 words from a .txt file.
+   * char words: Array in which randomly picked words to be put
+   * int num_lines: Number of lines in .txt file
+   * FILE *fp: File pointer
+   */
+
   int line_rand_word, flag = 1;
   char rand_word[MAX_LEN];
 
@@ -741,6 +783,7 @@ void pick_words(char words[][MAX_LEN], int num_lines, FILE *fp)
       int i = 0;
       for (int i = 0; i < w; i++)
       {
+        /* Check if picked word has a duplicate in the array */
         if (strcmp(words[i], words[w]) == 0)
         {
           flag = 1;
@@ -755,6 +798,9 @@ void pick_words(char words[][MAX_LEN], int num_lines, FILE *fp)
 }
 void print_board(char board[][COLUMN])
 {
+  /* This function displays the board.
+   * char board: Game board
+   */
   printf("\n");
   for (int i = 0; i < ROW; i++)
   {
@@ -766,6 +812,7 @@ void print_board(char board[][COLUMN])
       }
       else
       {
+        /* If an index has no letter on it, place a random letter */
         board[i][j] = (char)(97 + rand() % 26);
         printf("%c ", board[i][j]);
       }
@@ -776,6 +823,11 @@ void print_board(char board[][COLUMN])
 
 void left_to_right(char board[][COLUMN], char word[MAX_LEN], int x, int y)
 {
+  /* This function places the word from left to right.
+   * char board: Game board
+   * char word: Word to be placed
+   * int x, y: Coordinate of the first character of the word
+   */
   int len_word = strlen(word);
   for (int i = 0; i < len_word; i++)
   {
@@ -786,6 +838,11 @@ void left_to_right(char board[][COLUMN], char word[MAX_LEN], int x, int y)
 }
 void right_to_left(char board[][COLUMN], char word[MAX_LEN], int x, int y)
 {
+  /* This function places the word from right to left.
+   * char board: Game board
+   * char word: Word to be placed
+   * int x, y: Coordinate of the first character of the word
+   */
   int len_word = strlen(word);
   for (int i = 0; i < len_word; i++)
   {
@@ -795,30 +852,42 @@ void right_to_left(char board[][COLUMN], char word[MAX_LEN], int x, int y)
 }
 void downwards(char board[][COLUMN], char word[MAX_LEN], int x, int y)
 {
+  /* This function places the word downwards.
+   * char board: Game board
+   * char word: Word to be placed
+   * int x, y: Coordinate of the first character of the word
+   */
   int len_word = strlen(word);
   for (int i = 0; i < len_word; i++)
   {
-
     board[y][x] = word[i];
     y++;
   }
 }
 void upwards(char board[][COLUMN], char word[MAX_LEN], int x, int y)
 {
+  /* This function places the word upwards.
+   * char board: Game board
+   * char word: Word to be placed
+   * int x, y: Coordinate of the first character of the word
+   */
   int len_word = strlen(word);
   for (int i = 0; i < len_word; i++)
   {
-
     board[y][x] = word[i];
     y--;
   }
 }
 void diag_up_left_to_right(char board[][COLUMN], char word[MAX_LEN], int x, int y)
 {
+  /* This function places the word upwards diagonal, from left to right.
+   * char board: Game board
+   * char word: Word to be placed
+   * int x, y: Coordinate of the first character of the word
+   */
   int len_word = strlen(word);
   for (int i = 0; i < len_word; i++)
   {
-
     board[y][x] = word[i];
     x++;
     y--;
@@ -826,10 +895,14 @@ void diag_up_left_to_right(char board[][COLUMN], char word[MAX_LEN], int x, int 
 }
 void diag_up_right_to_left(char board[][COLUMN], char word[MAX_LEN], int x, int y)
 {
+  /* This function places the word upwards diagonal, from right to left.
+   * char board: Game board
+   * char word: Word to be placed
+   * int x, y: Coordinate of the first character of the word
+   */
   int len_word = strlen(word);
   for (int i = 0; i < len_word; i++)
   {
-
     board[y][x] = word[i];
     x--;
     y--;
@@ -837,10 +910,14 @@ void diag_up_right_to_left(char board[][COLUMN], char word[MAX_LEN], int x, int 
 }
 void diag_down_left_to_right(char board[][COLUMN], char word[MAX_LEN], int x, int y)
 {
+  /* This function places the word downwards diagonal, from left to right.
+   * char board: Game board
+   * char word: Word to be placed
+   * int x, y: Coordinate of the first character of the word
+   */
   int len_word = strlen(word);
   for (int i = 0; i < len_word; i++)
   {
-
     board[y][x] = word[i];
     x++;
     y++;
@@ -848,10 +925,14 @@ void diag_down_left_to_right(char board[][COLUMN], char word[MAX_LEN], int x, in
 }
 void diag_down_right_to_left(char board[][COLUMN], char word[MAX_LEN], int x, int y)
 {
+  /* This function places the word downwards diagonal, from right to left.
+   * char board: Game board
+   * char word: Word to be placed
+   * int x, y: Coordinate of the first character of the word
+   */
   int len_word = strlen(word);
   for (int i = 0; i < len_word; i++)
   {
-
     board[y][x] = word[i];
     x--;
     y++;
