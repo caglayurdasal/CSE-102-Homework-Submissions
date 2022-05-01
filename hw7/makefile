@@ -2,7 +2,7 @@ all: clean compile run
 
 clean:
 	@echo "Cleaning compiled files...\n"
-	@rm -f main
+	@rm -f test
 
 compile: main.c wordlist.txt
 	@echo "Compiling the source file...\n"
