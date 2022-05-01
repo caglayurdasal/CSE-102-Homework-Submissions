@@ -31,6 +31,7 @@ int main()
   /* Find the number of lines in the txt file */
   char c;
   int num_lines = 0;
+
   while (!feof(fp))
   {
     c = fgetc(fp);
@@ -44,13 +45,6 @@ int main()
 
   pick_words(words, num_lines, fp);
   fclose(fp);
-  /*
-  for (int i = 0; i < NUM_WORDS; i++)
-  {
-    printf("%d. word: %s", i + 1, words[i]);
-    printf("\n");
-  }
-  */
 
   /* Place the words */
   int dir;  /* Direction in which word to be placed */
@@ -471,35 +465,39 @@ int check_len(int x, int y, int len_word, int dir)
 void pick_words(char words[][MAX_LEN], int num_lines, FILE *fp)
 {
   /* Pick 7 random words and store them in an array */
-  int line_rand_word;
+  int line_rand_word, flag = 1;
   char rand_word[MAX_LEN];
 
-  srand((unsigned)time(NULL)); /* Seed */
-  for (int w = 0; w < NUM_WORDS; w++)
+  while (flag)
   {
-    fseek(fp, 0, SEEK_SET);                  /* Move pointer to the start */
-    line_rand_word = rand() % num_lines + 1; /* Pick a random line to be read */
-
-    for (int l = 0; l < line_rand_word; l++)
+    srand((unsigned)time(NULL)); /* Seed */
+    for (int w = 0; w < NUM_WORDS; w++)
     {
-      fgets(rand_word, sizeof(rand_word), fp); /* Update the word that is read until target line is reached */
-    }
-    fscanf(fp, "%s", rand_word);
-    strcpy(words[w], rand_word); /* Put the random word in the array */
+      fseek(fp, 0, SEEK_SET);                  /* Move pointer to the start */
+      line_rand_word = rand() % num_lines + 1; /* Pick a random line to be read */
+      printf("%d. word rand line: %d\n", w + 1, line_rand_word);
 
-    int i = 0;
-    while (i < w)
-    {
-      while (strcmp(words[i], words[w]) == 0)
+      for (int line = 0; line < line_rand_word; line++)
       {
-        pick_words(&words[w], num_lines, fp);
+        /* Update the word that is read until target line is reached */
+        fscanf(fp, "%s", words[w]);
       }
-      i++;
+
+      int i = 0;
+      for (int i = 0; i < w; i++)
+      {
+        if (strcmp(words[i], words[w]) == 0)
+        {
+          flag = 1;
+        }
+        else
+        {
+          flag = 0;
+        }
+      }
+
+      printf("%d. word: %s\n", w + 1, words[w]);
     }
-  }
-  for (size_t i = 0; i < NUM_WORDS; i++)
-  {
-    printf("%s\n", words[i]);
   }
 }
 void print_board(char board[][COLUMN])
