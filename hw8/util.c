@@ -28,57 +28,33 @@ void generate_sequence(int xs, int currentlen, int seqlen, int *seq)
 }
 int has_loop(int *arr, int n, int looplen, int *ls, int *le)
 {
-    int check = 0, check_len = 0;
+    int check = 0, check_len = 0, i = 0;
 
-    for (int i = 0; i < n - 1; i++)
+    for (i = 0; i < n - 2; i++)
     {
         if (check == 1)
         {
-            break;
+            return 1;
         }
-
-        for (int i = 0; i < n - 2; i++)
+        if (arr[i] == arr[i + looplen])
         {
-            if (check == 1)
+            for (int j = 1; j < looplen; j++)
             {
-                break;
-            }
-            for (int x = 1; x < n - i; x++)
-            {
-                if (arr[i] == arr[i + x])
+                if (arr[i + j] == arr[i + looplen + j])
                 {
-                    /* Check if there is a loop of a sequence of numbers */
-                    for (int m = 0; m <= looplen; m++)
-                    {
-                        if (arr[i + m] == arr[i + x + m])
-                        {
-                            // printf("Same values: arr[%d]==arr[%d+%d]->%d\n", i + m, i + x, m, arr[i + m]); -> I have printed these values for debugging
-                            check_len++;
-                            if (check_len == looplen)
-                            {
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            check_len = 0;
-                        }
-                    }
-
-                    if (check_len == looplen)
-                    {
-                        *ls = i;
-                        *le = i + looplen;
-
-                        check = 1;
-                        break;
-                    }
+                    *ls = i;
+                    *le = i + looplen;
+                    check = 1;
+                }
+                else
+                {
+                    check = 0;
                 }
             }
         }
-
-        return check;
     }
+
+    return check;
 }
 void check_loop_iterative(void (*f)(int, int, int, int *), int xs, int seqlen, int *loop, int *looplen)
 {
