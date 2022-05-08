@@ -11,7 +11,6 @@ int main()
 	int seq_len = seqlen;
 	looplen = &seq_len;
 	*looplen = seq_len / 2;
-	int *ls, *le;
 
 	printf("Please enter the first element: ");
 	scanf("%d", &xs);
@@ -21,13 +20,13 @@ int main()
 	check_loop_iterative(generate_sequence, xs, seqlen, loop, &seq_len);
 
 	/* Create histogram */
-	int h[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-	hist_of_firstdigits(generate_sequence, xs, seqlen, h, 1);
+	int h[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	int digit = 9;
+	hist_of_firstdigits(generate_sequence, xs, seqlen, h, digit);
 	printf("Histogram: {");
-	for (int i = 0; i < 9; i++)
+	for (int i = 1; i <= 9; i++)
 	{
-		if (i == 8)
+		if (i == 9)
 		{
 			printf("%d} ", h[i]);
 		}
