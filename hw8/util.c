@@ -28,7 +28,7 @@ void generate_sequence(int xs, int currentlen, int seqlen, int *seq)
 }
 int has_loop(int *arr, int n, int looplen, int *ls, int *le)
 {
-    int check = 0, check_len = 0, i = 0;
+    int check = 0, i = 0;
 
     for (i = 0; i < n - 2; i++)
     {
@@ -142,53 +142,32 @@ int firstDigit(int num)
 void hist_of_firstdigits(void (*f)(int, int, int, int *), int xs, int seqlen, int *h, int digit)
 {
     /* Generate the sequence */
-    int *sequence;
+
     int count_num;
 
-    sequence = (int *)malloc((seqlen) * sizeof(int));
-    int *seq = (int *)malloc(seqlen * sizeof(int)); // Allocating enough memory in the heap for the sequence
-    seq[0] = xs;                                    // First member of sequence is given by user
+    int *sequence = (int *)malloc(seqlen * sizeof(int)); // Allocating enough memory in the heap for the sequence
+    sequence[0] = xs;                                    // First member of sequence is given by user
     /* Call function f to generate the sequence */
-    f(xs, 0, seqlen, seq);
+    f(xs, 0, seqlen, sequence);
 
     for (int i = 0; i < seqlen; i++)
     {
-        sequence[i] = seq[i]; // Fill the array to check loop count later
-    }
-    free(seq);
+        count_num = firstDigit(sequence[i]);
 
-    // printf("xs:%d\n", xs);
-    // printf("seqlen:%d\n", seqlen);
-    // printf("digit: %d\n", digit);
-    if (digit == 9)
-    {
-        for (int i = 0; i < seqlen; i++)
+        if (count_num == digit)
         {
-            count_num = firstDigit(sequence[i]);
-            // printf("First digit: %d\n", count_num);
-            if (count_num == digit)
-            {
-                h[digit - 1]++;
-            }
-        }
-    }
 
-    else
-    {
-        // printf("digit: %d\n", digit);
-        for (int i = 0; i < seqlen; i++)
-        {
-            count_num = firstDigit(sequence[i]);
-            // printf("First digit: %d\n", count_num);
-            if (count_num == digit)
-            {
-                h[digit - 1]++;
-            }
+            h[digit]++;
         }
-
-        digit++;
-        // printf("digit+1: %d\n", digit);
-        hist_of_firstdigits(generate_sequence, xs, seqlen, h, digit);
     }
     free(sequence);
+    if (digit == 1) // base case
+    {
+        ;
+    }
+    else // recursive part
+    {
+        digit--;
+        hist_of_firstdigits(generate_sequence, xs, seqlen, h, digit);
+    }
 }
