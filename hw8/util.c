@@ -28,14 +28,12 @@ void generate_sequence(int xs, int currentlen, int seqlen, int *seq)
 }
 int has_loop(int *arr, int n, int looplen, int *ls, int *le)
 {
-
     int check = 0, check_len = 0;
 
     for (int i = 0; i < n - 1; i++)
     {
         if (check == 1)
         {
-            // return 1;
             break;
         }
 
@@ -43,7 +41,6 @@ int has_loop(int *arr, int n, int looplen, int *ls, int *le)
         {
             if (check == 1)
             {
-                // return 1;
                 break;
             }
             for (int x = 1; x < n - i; x++)
@@ -51,7 +48,7 @@ int has_loop(int *arr, int n, int looplen, int *ls, int *le)
                 if (arr[i] == arr[i + x])
                 {
                     /* Check if there is a loop of a sequence of numbers */
-                    for (int m = 0; m < looplen; m++)
+                    for (int m = 0; m <= looplen; m++)
                     {
                         if (arr[i + m] == arr[i + x + m])
                         {
@@ -155,4 +152,67 @@ void check_loop_iterative(void (*f)(int, int, int, int *), int xs, int seqlen, i
         looplen = &len;
         check_loop_iterative(generate_sequence, xs, seqlen, loop, &len);
     }
+}
+int firstDigit(int num)
+{
+    int first_digit;
+    while (num > 0)
+    {
+        first_digit = num;
+        num /= 10;
+    }
+    return first_digit;
+}
+void hist_of_firstdigits(void (*f)(int, int, int, int *), int xs, int seqlen, int *h, int digit)
+{
+    /* Generate the sequence */
+    int *sequence;
+    int count_num;
+
+    sequence = (int *)malloc((seqlen) * sizeof(int));
+    int *seq = (int *)malloc(seqlen * sizeof(int)); // Allocating enough memory in the heap for the sequence
+    seq[0] = xs;                                    // First member of sequence is given by user
+    /* Call function f to generate the sequence */
+    f(xs, 0, seqlen, seq);
+
+    for (int i = 0; i < seqlen; i++)
+    {
+        sequence[i] = seq[i]; // Fill the array to check loop count later
+    }
+    free(seq);
+
+    // printf("xs:%d\n", xs);
+    // printf("seqlen:%d\n", seqlen);
+    // printf("digit: %d\n", digit);
+    if (digit == 9)
+    {
+        for (int i = 0; i < seqlen; i++)
+        {
+            count_num = firstDigit(sequence[i]);
+            // printf("First digit: %d\n", count_num);
+            if (count_num == digit)
+            {
+                h[digit - 1]++;
+            }
+        }
+    }
+
+    else
+    {
+        // printf("digit: %d\n", digit);
+        for (int i = 0; i < seqlen; i++)
+        {
+            count_num = firstDigit(sequence[i]);
+            // printf("First digit: %d\n", count_num);
+            if (count_num == digit)
+            {
+                h[digit - 1]++;
+            }
+        }
+
+        digit++;
+        // printf("digit+1: %d\n", digit);
+        hist_of_firstdigits(generate_sequence, xs, seqlen, h, digit);
+    }
+    free(sequence);
 }
