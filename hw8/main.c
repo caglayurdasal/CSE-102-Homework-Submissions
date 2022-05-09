@@ -8,9 +8,8 @@ int main()
 	static int seqlen;
 	printf("Please enter the sequence length: ");
 	scanf("%d", &seqlen);
-	int hist_len = seqlen;
-
 	looplen = &seqlen;
+	int hist_len = seqlen;
 
 	printf("Please enter the first element: ");
 	scanf("%d", &xs);
