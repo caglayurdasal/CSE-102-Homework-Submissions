@@ -74,10 +74,10 @@ void check_loop_iterative(void (*f)(int, int, int, int *), int xs, int seqlen, i
     }
 
     int *seq;
-    /* Display the sequence first */
-
-    seq = (int *)malloc(seqlen * sizeof(int)); // Allocating enough memory in the heap for the sequence
-    seq[0] = xs;                               // First member of sequence is given by user
+    printf("Seqlen: %d\n", seqlen);
+    // seq = (int *)malloc(seqlen * sizeof(int)); // Allocating enough memory in the heap for the sequence
+    seq = calloc(seqlen, sizeof(int));
+    seq[0] = xs; // First member of sequence is given by user
     /* Generate the sequence */
     f(xs, 0, seqlen, seq);
     /* Display the sequence */
