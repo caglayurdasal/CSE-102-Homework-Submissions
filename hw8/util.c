@@ -32,6 +32,7 @@ int has_loop(int *arr, int n, int looplen, int *ls, int *le)
 
     for (i = 0; i < n - 2; i++)
     {
+
         if (check == 1)
         {
             return 1;
@@ -65,19 +66,27 @@ void check_loop_iterative(void (*f)(int, int, int, int *), int xs, int seqlen, i
     int check;
     static int display_check = 0;
     int len = *looplen;
+    static int len_check = 0;
+    if (len_check == 0)
+    {
+        *looplen = seqlen / 2;
+        len_check = 1;
+    }
 
+    int *seq;
     /* Display the sequence first */
+
+    seq = (int *)malloc(seqlen * sizeof(int)); // Allocating enough memory in the heap for the sequence
+    seq[0] = xs;                               // First member of sequence is given by user
+    /* Generate the sequence */
+    f(xs, 0, seqlen, seq);
+    /* Display the sequence */
     if (display_check == 0)
     {
-        int *seq = (int *)malloc(seqlen * sizeof(int)); // Allocating enough memory in the heap for the sequence
-        seq[0] = xs;                                    // First member of sequence is given by user
-        /* Generate the sequence */
-        f(xs, 0, seqlen, seq);
-        /* Display the sequence */
         printf("\nSequence: {");
         for (int i = 0; i < seqlen; i++)
         {
-            loop[i] = seq[i]; // Fill the array to check loop count later
+            // loop[i] = seq[i]; // Fill the array to check loop count later
             if (i == seqlen - 1)
             {
                 printf("%d}\n\n", seq[i]);
@@ -89,44 +98,38 @@ void check_loop_iterative(void (*f)(int, int, int, int *), int xs, int seqlen, i
         }
         display_check = 1; // Display the sequence only once
 
-        free(seq);
+        // free(seq);
     }
     /* After displaying the sequence, check for loop count recursively*/
+    // for (int i = 0; i < seqlen; i++)
+    // {
+    //     printf("Seq[%d]=%d\n", i, seq[i]);
+    // }
     if (len >= 2)
     {
         printf("Checking if there is a loop of length %d...\n", *looplen);
-        check = has_loop(loop, seqlen, *looplen, &start, &end);
+        int temp_len = *looplen;
+        check = has_loop(seq, seqlen, temp_len, &start, &end);
     }
 
     if (len <= 2 || check == 1) // base case
     {
-        if (check == 0)
+        if (check != 0)
         {
-            printf("No loop found.\n");
-        }
-        else
-        {
+
             printf("\nLoop detected with a length of %d.\n", *looplen);
             printf("The indexes of the loop's first occurrence: %d(first digit), %d(last digit)\n", *ls, *le);
-            printf("Loop: {");
             for (int i = 0; i < *looplen; i++)
             {
-                if (i == *looplen - 1)
-                {
-                    printf("%d}\n", loop[start + i]);
-                }
-                else
-                {
-                    printf("%d,", loop[start + i]);
-                }
+                loop[i] = seq[start];
+                start++;
             }
         }
     }
     else // recursive part
     {
-        len--;
-        looplen = &len;
-        check_loop_iterative(generate_sequence, xs, seqlen, loop, &len);
+        (*looplen)--;
+        check_loop_iterative(f, xs, seqlen, loop, looplen);
     }
 }
 int firstDigit(int num)
