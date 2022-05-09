@@ -74,10 +74,9 @@ void check_loop_iterative(void (*f)(int, int, int, int *), int xs, int seqlen, i
     }
 
     int *seq;
-    printf("Seqlen: %d\n", seqlen);
-    // seq = (int *)malloc(seqlen * sizeof(int)); // Allocating enough memory in the heap for the sequence
-    seq = calloc(seqlen, sizeof(int));
-    seq[0] = xs; // First member of sequence is given by user
+
+    seq = calloc(seqlen, 2 * sizeof(int)); // Allocating enough memory in the heap for the sequence
+    seq[0] = xs;                           // First member of sequence is given by user
     /* Generate the sequence */
     f(xs, 0, seqlen, seq);
     /* Display the sequence */
@@ -100,11 +99,7 @@ void check_loop_iterative(void (*f)(int, int, int, int *), int xs, int seqlen, i
 
         // free(seq);
     }
-    /* After displaying the sequence, check for loop count recursively*/
-    // for (int i = 0; i < seqlen; i++)
-    // {
-    //     printf("Seq[%d]=%d\n", i, seq[i]);
-    // }
+
     if (len >= 2)
     {
         printf("Checking if there is a loop of length %d...\n", *looplen);
@@ -148,8 +143,8 @@ void hist_of_firstdigits(void (*f)(int, int, int, int *), int xs, int seqlen, in
 
     int count_num;
 
-    int *sequence = (int *)malloc(seqlen * sizeof(int)); // Allocating enough memory in the heap for the sequence
-    sequence[0] = xs;                                    // First member of sequence is given by user
+    int *sequence = (int *)malloc(seqlen * 2 * sizeof(int)); // Allocating enough memory in the heap for the sequence
+    sequence[0] = xs;                                        // First member of sequence is given by user
     /* Call function f to generate the sequence */
     f(xs, 0, seqlen, sequence);
 
