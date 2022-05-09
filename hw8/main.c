@@ -8,21 +8,44 @@ int main()
 	static int seqlen;
 	printf("Please enter the sequence length: ");
 	scanf("%d", &seqlen);
-	int seq_len = seqlen;
-	looplen = &seq_len;
-	*looplen = seq_len / 2;
+	int hist_len = seqlen;
+
+	looplen = &seqlen;
 
 	printf("Please enter the first element: ");
 	scanf("%d", &xs);
-	int *loop = (int *)malloc((seqlen) * sizeof(int));
+	int *loop;
+	loop = (int *)malloc(sizeof(int) * (seqlen / 2));
 
 	/* Generate the sequence and check for the loop count */
-	check_loop_iterative(generate_sequence, xs, seqlen, loop, &seq_len);
+	check_loop_iterative(generate_sequence, xs, seqlen, loop, looplen);
+
+	if (seqlen > 2)
+	{
+		printf("Loop: {");
+		for (int i = 0; i < seqlen; i++)
+		{
+
+			if (i == seqlen - 1)
+			{
+				printf("%d}\n", loop[i]);
+			}
+			else
+			{
+				printf("%d,", loop[i]);
+			}
+		}
+	}
+	else
+	{
+		printf("No loop is found.\n");
+	}
 
 	/* Create histogram */
 	int h[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	int digit = 9;
-	hist_of_firstdigits(generate_sequence, xs, seqlen, h, digit);
+
+	hist_of_firstdigits(generate_sequence, xs, hist_len, h, digit);
 	printf("Histogram: {");
 	for (int i = 1; i <= 9; i++)
 	{
