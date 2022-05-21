@@ -4,7 +4,7 @@ void listCustomers();
 
 void addCustomer();
 
-int newLoan();
+void newLoan();
 
 float calculateLoan(float amount, int period, float interestRate);
 
@@ -137,4 +137,7 @@ float calculateLoan(float amount, int period, float interestRate)
     {
         return ((1 + interestRate) * calculateLoan(amount, period - 1, interestRate));
     }
+}
+void newLoan()
+{
 }
