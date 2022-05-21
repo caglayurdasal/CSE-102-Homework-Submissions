@@ -2,7 +2,7 @@
 
 void listCustomers();
 
-int addCustomer();
+void addCustomer();
 
 int newLoan();
 
@@ -24,15 +24,14 @@ union Loan
 };
 struct BankAccount
 {
-    union Person Customer[3];
+    union Person Customer;
     union Loan Loans[3];
 };
+struct BankAccount account[50];
+static int num_customers = 0;
 
 int main()
 {
-    FILE *fp;
-
-    fp = fopen("customers.txt", "a+");
 
     int sel;
     float amount = 10000;
@@ -57,21 +56,7 @@ int main()
             listCustomers();
             break;
         case 2:
-            /* Add new customer information from the user */
-            // Save the customer information in the database
-            // printf("Customer Name: ");
-            // fflush(stdin);
-            // scanf("%[^\n]s", account.Customer->name);
-            // fprintf(fp, "%s ", account.Customer->name);
-            // printf("Customer Phone: ");
-            // fflush(stdin);
-            // scanf("%d", &account.Customer->phone);
-            // fprintf(fp, "%d ", account.Customer->phone);
-            // printf("Customer Address: ");
-            // fflush(stdin);
-            // scanf("%[^\n]s", account.Customer->address);
-            // fprintf(fp, "%s\n", account.Customer->address);
-
+            addCustomer();
             break;
         case 3:
             break;
@@ -84,29 +69,55 @@ int main()
             break;
         }
     } while (sel != 5);
-    fclose(fp);
+
     return 0;
+}
+void addCustomer()
+{
+    /* Add new customer information from the user and
+     * save the customer information in the database*/
+
+    FILE *fp;
+    fp = fopen("customers.txt", "a+");
+
+    printf("Customer Phone: ");
+    fflush(stdin);
+    scanf("%d", &account[num_customers].Customer.phone);
+    fprintf(fp, "%d ", account[num_customers].Customer.phone);
+    printf("Customer Address: ");
+    fflush(stdin);
+    scanf("%[^\n]s", account[num_customers].Customer.address);
+    fprintf(fp, "%s ", account[num_customers].Customer.address);
+    printf("Customer Name: ");
+    fflush(stdin);
+    scanf("%[^\n]s", account[num_customers].Customer.name);
+    fprintf(fp, "%s\n", account[num_customers].Customer.name);
+    num_customers++;
 }
 void listCustomers()
 {
-    struct BankAccount account;
-    int num_lines = 0;
-    FILE *fp;
-    fp = fopen("customers.txt", "r");
-    rewind(fp);
-    while (!feof(fp))
+
+    for (int i = 0; i < num_customers; i++)
     {
-        fscanf(fp, "%s ", account.Customer->name);
-        printf("Customer ID = %d\n", num_lines + 1);
-        printf("Customer Name = %s\n", account.Customer->name);
-        // fscanf(fp, "%d %[^\n]s", &account.Customer->phone, account.Customer->address);
-        fscanf(fp, "%d ", &account.Customer->phone);
-        printf("Customer Phone = %d\n", account.Customer->phone);
-        fscanf(fp, "%[^\n]s", account.Customer->address);
-        printf("Customer Address = %s\n", account.Customer->address);
-        num_lines++;
+        printf("Customer ID = %d\n", i + 1);
+        printf("Customer Name = %s\n", account[i].Customer.name);
     }
-    fclose(fp);
+
+    // FILE *fp;
+    // fp = fopen("customers.txt", "r");
+    // rewind(fp);
+    // while (!feof(fp))
+    // {
+    //     fscanf(fp, "%s ", account.Customer.name);
+    //     printf("Customer ID = %d\n", num_lines + 1);
+    //     printf("Customer Name = %s\n", account.Customer.name);
+    //     fscanf(fp, "%d ", &account.Customer.phone);
+    //     printf("Customer Phone = %d\n", account.Customer.phone);
+    //     fscanf(fp, "%[^\n]s", account.Customer.address);
+    //     printf("Customer Address = %s\n", account.Customer.address);
+    //     num_lines++;
+    // }
+    // fclose(fp);
 }
 float calculateLoan(float amount, int period, float interestRate)
 {
