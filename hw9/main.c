@@ -8,7 +8,7 @@ int newLoan();
 
 float calculateLoan(float amount, int period, float interestRate);
 
-int getReport();
+void getReport();
 
 union Person
 {
@@ -29,17 +29,12 @@ struct BankAccount
 struct BankAccount account[50];
 static int num_customers = 0;
 int loan_check[50][3] = {0};
+int periods[50][3];
 
 int main()
 {
     int sel, loan_check;
-    FILE *flp;
-    flp = fopen("loans.txt", "w");
-    for (int i = 0; i < 50; i++)
-    {
-        fprintf(flp, "%f \n", 1.0);
-    }
-    fclose(flp);
+
     printf("=====================================\n");
     printf("Welcome to the Bank Management System\n");
     printf("=====================================\n");
@@ -72,6 +67,7 @@ int main()
 
             break;
         case 4:
+            getReport();
             break;
         case 5:
             break;
@@ -87,7 +83,7 @@ void addCustomer()
 {
     /* Add new customer information from the user and
      * save the customer information in the database*/
-
+    char buffer[100];
     FILE *fp;
     fp = fopen("customers.txt", "a+");
 
@@ -106,7 +102,7 @@ void addCustomer()
     printf("Customer Name: ");
     fflush(stdin);
     scanf("%[^\n]s", account[num_customers].Customer.name);
-    fprintf(fp, "%s \n", account[num_customers].Customer.name);
+    fprintf(fp, "%s\n", account[num_customers].Customer.name);
 
     num_customers++;
     fclose(fp);
@@ -138,18 +134,69 @@ float calculateLoan(float amount, int period, float interestRate)
         return ((1 + interestRate) * calculateLoan(amount, period - 1, interestRate));
     }
 }
+void getReport()
+{
+    FILE *fp;
+    fp = fopen("customers.txt", "r");
+    int sel, which_credit, which_customer, i = 0;
+    printf("Enter 1 for customer details, 2 for credit details: ");
+    scanf("%d", &sel);
+    if (sel == 1)
+    {
+        rewind(fp);
+        while (i < num_customers)
+        {
+            printf("Customer ID = %d\n", i + 1);
+            fscanf(fp, "%d ", &account[i].Customer.phone);
+            printf("Customer Phone = %d\n", account[i].Customer.phone);
+            fscanf(fp, "%s ", account[i].Customer.address);
+            printf("Customer Address = %s\n", account[i].Customer.address);
+            fscanf(fp, "%s ", account[i].Customer.name);
+            printf("Customer Name = %s\n", account[i].Customer.name);
+            i++;
+        }
+    }
+    else if (sel == 2)
+    {
+        printf("Which customer's credit do you want to display? ");
+        scanf("%d", &which_customer);
+        printf("Which credit do you want to display? ");
+        scanf("%d", &which_credit);
+        printf("Total credit value = %.4f\n", account[which_customer - 1].Loans->arr[which_credit - 1]);
+        for (int m = 0; m < periods[which_customer - 1][which_credit - 1]; m++)
+        {
+            printf("%d. month installment = %.4f\n", m + 1, account[which_customer - 1].Loans->arr[which_credit - 1] / (float)periods[which_customer - 1][which_credit - 1]);
+        }
+    }
+}
 int newLoan()
 {
-    int customer_id, num_loans = 0, loan_amount = 0;
+    int customer_id, loan_amount = 0, current_id = 1, id_check = 0;
     float loan, auxAmount, auxPeriod, auxInterestRate;
-    FILE *flp;
-    char buffer[50], loans[4], *lp;
-
-    // flp = fopen("loans.txt", "a+");
-    // rewind(flp);
+    char buffer[50];
+    FILE *fp;
+    fp = fopen("customers.txt", "r");
 
     printf("Which customer do you want to give the loan to? Enter ID: ");
     scanf("%d", &customer_id);
+
+    while (!feof(fp))
+    {
+        fgets(buffer, 50, fp);
+        if (current_id == customer_id)
+        {
+            id_check++;
+        }
+        else
+        {
+            current_id++;
+        }
+    }
+    fclose(fp);
+    if (id_check == 0)
+    {
+        return -1;
+    }
 
     for (int i = 0; i < 3; i++)
     {
@@ -169,6 +216,7 @@ int newLoan()
             printf("Enter period: ");
             fflush(stdin);
             scanf("%f", &auxPeriod);
+            periods[customer_id - 1][i] = auxPeriod;
             printf("Enter interest rate: ");
             fflush(stdin);
             scanf("%f", &auxInterestRate);
