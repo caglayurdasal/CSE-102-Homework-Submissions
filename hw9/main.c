@@ -19,9 +19,7 @@ union Person
 };
 union Loan
 {
-    float amount;
-    float interestRate;
-    int period;
+    float arr[3]; // amount, period, interestRate
 };
 struct BankAccount
 {
@@ -30,12 +28,18 @@ struct BankAccount
 };
 struct BankAccount account[50];
 static int num_customers = 0;
-float customer_loans[50][3];
+int loan_check[50][3] = {0};
 
 int main()
 {
-    int sel;
-
+    int sel, loan_check;
+    FILE *flp;
+    flp = fopen("loans.txt", "w");
+    for (int i = 0; i < 50; i++)
+    {
+        fprintf(flp, "%f \n", 1.0);
+    }
+    fclose(flp);
     printf("=====================================\n");
     printf("Welcome to the Bank Management System\n");
     printf("=====================================\n");
@@ -56,10 +60,16 @@ int main()
             addCustomer();
             break;
         case 3:
-            if (newLoan() == 0)
+            loan_check = newLoan();
+            if (loan_check == 0)
             {
                 printf("No more loans can be given to this customer.\n");
             }
+            else if (loan_check == -1)
+            {
+                printf("You have entered an invalid ID\n");
+            }
+
             break;
         case 4:
             break;
@@ -89,10 +99,10 @@ void addCustomer()
     fflush(stdin);
     scanf("%[^\n]s", account[num_customers].Customer.address);
     fprintf(fp, "%s ", account[num_customers].Customer.address);
-    printf("Customer ID: ");
-    fflush(stdin);
-    scanf("%d", &account[num_customers].Customer.id);
-    fprintf(fp, "%d ", account[num_customers].Customer.id);
+    // printf("Customer ID: ");
+    // fflush(stdin);
+    // scanf("%d", &account[num_customers].Customer.id);
+    // fprintf(fp, "%d ", account[num_customers].Customer.id);
     printf("Customer Name: ");
     fflush(stdin);
     scanf("%[^\n]s", account[num_customers].Customer.name);
@@ -130,61 +140,45 @@ float calculateLoan(float amount, int period, float interestRate)
 }
 int newLoan()
 {
-    int i, auxPeriod, num_loans = 0, loan_amount = 0;
-    float loan, auxAmount, auxInterestRate;
-    FILE *fp, *f, *aux;
-    char *ptr, loansPerLine[50];
-    f = fopen("customers.txt", "r");
-    fp = fopen("loans.txt", "a+");
+    int customer_id, num_loans = 0, loan_amount = 0;
+    float loan, auxAmount, auxPeriod, auxInterestRate;
+    FILE *flp;
+    char buffer[50], loans[4], *lp;
+
+    // flp = fopen("loans.txt", "a+");
+    // rewind(flp);
 
     printf("Which customer do you want to give the loan to? Enter ID: ");
-    scanf("%d", &i);
-    int line = 0;
-    while (line < i)
-    {
-        fgets("%[\n]s", 50, f);
-        line++;
-    }
-    fread(aux, "%d %s %d %s ", );
-    while (loan_amount < 3 && (ptr = fgets(loansPerLine, 50, f)))
-    {
-        if (*(ptr + 2) == '\n')
-        {
-            break;
-        }
-        while (*ptr)
-        {
-            while (*(ptr + 1) < '0' || *(ptr + 1) > '9')
-            {
-                ptr++;
-            }
-            if (*(ptr + 1) >= '0' && *(ptr + 1) <= '9')
-            {
-                loan_amount++;
-                if (loan_amount == 3)
-                {
-                    return 0;
-                }
-            }
-            while (*(ptr + 1) >= '0' && *(ptr + 1) <= '9')
-            {
-                ptr++;
-            }
-        }
-    }
+    scanf("%d", &customer_id);
 
-    printf("Enter amount: ");
-    scanf("%f", &account[i].Loans[num_loans].amount);
-    auxAmount = account[i].Loans[num_loans].amount;
-    printf("Enter interest rate: ");
-    scanf("%f", &account[i].Loans[num_loans].interestRate);
-    auxInterestRate = account[i].Loans[num_loans].interestRate;
-    printf("Enter period: ");
-    scanf("%d", &account[i].Loans[num_loans].period);
-    auxPeriod = account[i].Loans[num_loans].period;
-    customer_loans[i][loan_amount] = calculateLoan(auxAmount, auxPeriod, auxInterestRate);
-    fprintf(fp, "%f ", customer_loans[i][loan_amount]);
-    printf("Calculated loan: %.2f\n", customer_loans[i][loan_amount]);
-    fclose(fp);
-    return 1;
+    for (int i = 0; i < 3; i++)
+    {
+        if (loan_check[customer_id - 1][i] > 0)
+        {
+            loan_amount++;
+            if (loan_amount == 3)
+            {
+                return 0;
+            }
+        }
+        else
+        {
+            printf("Enter amount: ");
+            fflush(stdin);
+            scanf("%f", &auxAmount);
+            printf("Enter period: ");
+            fflush(stdin);
+            scanf("%f", &auxPeriod);
+            printf("Enter interest rate: ");
+            fflush(stdin);
+            scanf("%f", &auxInterestRate);
+
+            /* Calculate the loan */
+            loan = calculateLoan(auxAmount, auxPeriod, auxInterestRate);
+            loan_check[customer_id - 1][i] = loan;
+            account[customer_id - 1].Loans->arr[i] = loan;
+
+            return 1;
+        }
+    }
 }
