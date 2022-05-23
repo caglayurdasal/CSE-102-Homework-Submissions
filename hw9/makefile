@@ -2,7 +2,7 @@ all: clean compile run
 
 clean: 
 	@echo "Cleaning compiled files...\n"
-	@rm -rf test customers.txt
+	@rm -rf test 
 
 compile:
 	@echo "Compiling main.c...\n"
